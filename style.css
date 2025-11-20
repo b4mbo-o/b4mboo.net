@@ -1,0 +1,283 @@
+/* --- Color Variables --- */
+:root {
+    --transition-speed: 0.4s;
+}
+
+/* Dark Theme (Default) */
+[data-theme="dark"] {
+    --bg-color: #080808;
+    --card-bg: #121212;
+    --text-main: #e0e0e0;
+    --text-sub: #888888;
+    --card-border: #222;
+    --card-hover-bg: #1a1a1a;
+    
+    --bamboo-green: #7abf75;
+    --bamboo-glow: rgba(122, 191, 117, 0.4);
+    --bamboo-node: #4d7a4a;
+    --stalk-gradient-start: #1a2e1a;
+    --stalk-gradient-mid: #2d4f2c;
+
+    --shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+    --shadow-hover: 0 12px 40px rgba(122, 191, 117, 0.1);
+    
+    --modal-bg: #151515;
+    --modal-overlay: rgba(0, 0, 0, 0.8);
+    --input-bg: #0a0a0a;
+
+    /* アイコン表示制御 */
+    --sun-opacity: 0;
+    --sun-scale: 0.5;
+    --sun-rotate: 90deg;
+    --moon-opacity: 1;
+    --moon-scale: 1;
+    --moon-rotate: 0deg;
+}
+
+/* Light Theme */
+[data-theme="light"] {
+    --bg-color: #f9fcf9;
+    --card-bg: #ffffff;
+    --text-main: #2c3e2d;
+    --text-sub: #5a6e5b;
+    --card-border: #e0e0e0;
+    --card-hover-bg: #f4f9f4;
+
+    --bamboo-green: #4a8c46;
+    --bamboo-glow: rgba(74, 140, 70, 0.2);
+    --bamboo-node: #8dbf8a;
+    --stalk-gradient-start: #e8f5e8;
+    --stalk-gradient-mid: #ccebcc;
+
+    --shadow: 0 4px 20px rgba(45, 79, 44, 0.08);
+    --shadow-hover: 0 10px 30px rgba(45, 79, 44, 0.15);
+
+    --modal-bg: #ffffff;
+    --modal-overlay: rgba(255, 255, 255, 0.6);
+    --input-bg: #f5f5f7;
+
+    /* アイコン表示制御 */
+    --sun-opacity: 1;
+    --sun-scale: 1;
+    --sun-rotate: 0deg;
+    --moon-opacity: 0;
+    --moon-scale: 0.5;
+    --moon-rotate: -90deg;
+}
+
+* { margin: 0; padding: 0; box-sizing: border-box; }
+
+body {
+    font-family: 'Manrope', 'Zen Kaku Gothic New', sans-serif;
+    background-color: var(--bg-color);
+    color: var(--text-main);
+    line-height: 1.6;
+    overflow-x: hidden;
+    cursor: none;
+    position: relative;
+    transition: background-color var(--transition-speed) ease, color var(--transition-speed) ease;
+}
+
+/* --- Bamboo Art --- */
+.bamboo-bg {
+    position: fixed; top: 0; right: 8%;
+    height: 100vh; width: 100px; z-index: -1;
+    display: flex; justify-content: center;
+    opacity: 0.8; pointer-events: none;
+}
+.stalk {
+    width: 12px; height: 100%;
+    background: linear-gradient(to right, var(--stalk-gradient-start), var(--stalk-gradient-mid), var(--stalk-gradient-start));
+    position: relative;
+    box-shadow: 0 0 20px var(--bamboo-glow);
+    border-left: 1px solid rgba(128,128,128,0.1);
+    transition: background var(--transition-speed) ease, box-shadow var(--transition-speed) ease;
+}
+.stalk::after {
+    content: ''; position: absolute; top: 0; left: -4px;
+    width: 20px; height: 100%;
+    background-image: repeating-linear-gradient(
+        to bottom,
+        transparent 0px,
+        transparent 140px,
+        var(--bamboo-green) 140px,
+        var(--bamboo-green) 142px,
+        var(--bamboo-node) 142px,
+        var(--bamboo-node) 144px
+    );
+    box-shadow: 0 0 10px var(--bamboo-glow);
+    z-index: 1; opacity: 0.8;
+}
+
+/* --- Cursor --- */
+.cursor-dot {
+    width: 8px; height: 8px; background-color: var(--bamboo-green);
+    position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+    border-radius: 50%; z-index: 9999; pointer-events: none;
+}
+.cursor-outline {
+    width: 40px; height: 40px; border: 1px solid var(--bamboo-green);
+    position: fixed; top: 0; left: 0; transform: translate(-50%, -50%);
+    border-radius: 50%; z-index: 9999; pointer-events: none;
+    transition: width 0.2s, height 0.2s, background-color 0.2s; opacity: 0.5;
+}
+
+/* --- Layout --- */
+.container {
+    max-width: 900px; margin: 0 auto; padding: 100px 20px;
+    opacity: 0; animation: fadeIn 1.5s ease-out forwards;
+}
+.hero { 
+    margin-bottom: 80px; 
+    border-left: 2px solid var(--bamboo-green); 
+    padding-left: 30px; transition: border-color var(--transition-speed) ease;
+}
+.logo {
+    font-size: 4.5rem; font-weight: 800; letter-spacing: -0.04em;
+    color: var(--text-main); margin-bottom: 5px; line-height: 1;
+}
+.logo .dot { color: var(--bamboo-green); }
+.bamboo-char {
+    font-family: inherit; font-style: normal; font-weight: inherit;
+    color: var(--bamboo-green); text-shadow: 0 0 15px var(--bamboo-glow);
+}
+.bio { font-size: 1rem; color: var(--text-sub); font-family: 'Manrope', monospace; letter-spacing: 1px; }
+
+.sns-nav { margin-top: 25px; display: flex; gap: 20px; align-items: center; }
+.sns-link {
+    text-decoration: none; color: var(--text-main);
+    font-size: 0.85rem; font-weight: 600; position: relative;
+    opacity: 0.7; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px;
+}
+.sns-link:hover { opacity: 1; color: var(--bamboo-green); }
+
+/* --- Theme Button (修正版: 鉄壁の正円) --- */
+.theme-btn {
+    background: transparent;
+    border: 1px solid var(--card-border);
+    color: var(--text-main);
+    
+    /* サイズ固定の強制 */
+    width: 44px;
+    height: 44px;
+    min-width: 44px; /* これで絶対に潰れなくなる */
+    border-radius: 50%;
+    padding: 0; /* 余計な余白を削除 */
+    
+    cursor: pointer;
+    position: relative;
+    overflow: hidden;
+    flex-shrink: 0; /* Flexboxによる縮小を禁止 */
+    
+    display: grid; /* アイコンをど真ん中に配置 */
+    place-items: center;
+    
+    transition: all 0.3s;
+}
+
+.theme-btn:hover {
+    border-color: var(--bamboo-green);
+    background: var(--card-hover-bg);
+}
+
+.theme-btn .icon {
+    position: absolute;
+    /* グリッド配置しているのでtop/left指定は不要だが、
+       アニメーションの基準点として絶対配置を維持 */
+    top: 50%; left: 50%;
+    transform-origin: center;
+    transition: all 0.5s cubic-bezier(0.4, 0.0, 0.2, 1);
+}
+
+/* Sun Icon Logic */
+.sun-icon {
+    opacity: var(--sun-opacity);
+    transform: translate(-50%, -50%) rotate(var(--sun-rotate)) scale(var(--sun-scale));
+}
+
+/* Moon Icon Logic */
+.moon-icon {
+    opacity: var(--moon-opacity);
+    transform: translate(-50%, -50%) rotate(var(--moon-rotate)) scale(var(--moon-scale));
+}
+
+
+/* --- Cards --- */
+.grid-wrapper {
+    display: grid; grid-template-columns: repeat(auto-fit, minmax(260px, 1fr)); gap: 24px;
+}
+.card {
+    background: var(--card-bg); border: 1px solid var(--card-border);
+    border-radius: 12px; padding: 25px; box-shadow: var(--shadow);
+    transition: all 0.3s ease; text-decoration: none; color: inherit;
+    position: relative; display: flex; flex-direction: column; justify-content: space-between;
+    height: 200px; overflow: hidden;
+}
+.card:hover {
+    transform: translateY(-5px); border-color: var(--bamboo-green);
+    box-shadow: var(--shadow-hover); background: var(--card-hover-bg);
+}
+.profile-card {
+    grid-column: 1 / -1; height: auto; min-height: 160px;
+    background: var(--card-bg); border-left: 4px solid var(--bamboo-green);
+}
+.card-label {
+    font-size: 0.7rem; text-transform: uppercase; letter-spacing: 2px;
+    color: var(--bamboo-green); margin-bottom: 15px; display: block; font-weight: bold;
+}
+.profile-card h2 { font-size: 1.5rem; margin-bottom: 10px; color: var(--text-main); }
+.profile-card p { color: var(--text-sub); font-size: 0.9rem; max-width: 600px; }
+
+.card-top { display: flex; justify-content: space-between; align-items: center; }
+.service-name { font-size: 1.3rem; font-weight: 700; color: var(--text-main); }
+.status-dot {
+    width: 6px; height: 6px; background-color: var(--bamboo-green);
+    border-radius: 50%; box-shadow: 0 0 8px var(--bamboo-green);
+}
+.service-desc { font-size: 0.85rem; color: var(--text-sub); margin-top: auto; margin-bottom: 10px; }
+.card-footer { 
+    font-size: 0.75rem; color: var(--text-sub); font-family: monospace; 
+    border-top: 1px solid var(--card-border); padding-top: 10px; width: 100%; opacity: 0.7;
+}
+.card:hover .card-footer { color: var(--bamboo-green); border-color: var(--bamboo-green); opacity: 1; }
+.card.locked { opacity: 0.6; cursor: pointer; background: var(--bg-color); }
+.card.locked:hover { opacity: 1; border-color: var(--text-sub); }
+
+/* --- Modal --- */
+.modal-overlay {
+    position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+    background: var(--modal-overlay); backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px); z-index: 10000;
+    display: flex; align-items: center; justify-content: center;
+    opacity: 0; visibility: hidden; transition: all 0.3s;
+}
+.modal-overlay.active { opacity: 1; visibility: visible; }
+.modal-content {
+    background: var(--modal-bg); padding: 40px; border-radius: 16px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.2); width: 90%; max-width: 380px;
+    text-align: center; transform: scale(0.9); transition: transform 0.3s;
+    border: 1px solid var(--card-border);
+}
+.modal-overlay.active .modal-content { transform: scale(1); }
+.modal-title { font-size: 1.3rem; color: var(--text-main); margin-bottom: 5px; }
+.modal-desc { font-size: 0.85rem; color: var(--text-sub); margin-bottom: 25px; }
+.modal-input {
+    width: 100%; padding: 12px; background: var(--input-bg);
+    border: 1px solid var(--card-border); color: var(--text-main);
+    border-radius: 8px; font-size: 1.1rem; outline: none;
+    margin-bottom: 25px; text-align: center; letter-spacing: 3px; font-family: monospace;
+}
+.modal-input:focus { border-color: var(--bamboo-green); }
+.modal-actions { display: flex; gap: 10px; justify-content: center; }
+button { padding: 10px 28px; border-radius: 4px; font-size: 0.85rem; font-weight: 600; cursor: pointer; border: none; }
+.btn-cancel { background: transparent; color: var(--text-sub); border: 1px solid var(--card-border); }
+.btn-cancel:hover { border-color: var(--text-main); color: var(--text-main); }
+.btn-enter { background: var(--bamboo-green); color: #fff; } /* 文字色固定 */
+.btn-enter:hover { opacity: 0.9; box-shadow: 0 0 15px var(--bamboo-glow); }
+
+footer { margin-top: 100px; text-align: center; font-size: 0.7rem; color: var(--text-sub); letter-spacing: 2px; }
+@keyframes fadeIn { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+@media (max-width: 600px) {
+    .logo { font-size: 3rem; } .bamboo-bg { right: -20px; opacity: 0.5; }
+    .cursor-dot, .cursor-outline { display: none; } body { cursor: auto; }
+}
