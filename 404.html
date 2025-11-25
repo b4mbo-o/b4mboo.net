@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>404 NotFound | b4mboo.net</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600;800&family=Zen+Kaku+Gothic+New:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg: #080c08;
+            --card: rgba(12, 18, 12, 0.85);
+            --accent: #7abf75;
+            --text: #e6f0e6;
+            --sub: #8aa08a;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            min-height: 100vh;
+            font-family: 'Manrope', 'Zen Kaku Gothic New', sans-serif;
+            background: radial-gradient(circle at 20% 20%, rgba(122, 191, 117, 0.08), transparent 30%),
+                        radial-gradient(circle at 80% 10%, rgba(122, 191, 117, 0.06), transparent 25%),
+                        linear-gradient(135deg, #060a06, #0b120b 55%, #040704);
+            color: var(--text);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: hidden;
+        }
+        .grid {
+            position: absolute;
+            inset: 0;
+            background-image:
+                repeating-linear-gradient(
+                    to right,
+                    rgba(122, 191, 117, 0.08),
+                    rgba(122, 191, 117, 0.08) 1px,
+                    transparent 1px,
+                    transparent 80px
+                ),
+                repeating-linear-gradient(
+                    to bottom,
+                    rgba(122, 191, 117, 0.05),
+                    rgba(122, 191, 117, 0.05) 1px,
+                    transparent 1px,
+                    transparent 80px
+                );
+            opacity: 0.3;
+            pointer-events: none;
+        }
+        .bamboo {
+            position: absolute;
+            inset: 0;
+            pointer-events: none;
+        }
+        .stalk {
+            position: absolute;
+            width: 8px;
+            height: 120%;
+            background: linear-gradient(to right, #1a2e1a, #2d4f2c, #1a2e1a);
+            box-shadow: 0 0 16px rgba(122, 191, 117, 0.2);
+            opacity: 0.7;
+        }
+        .stalk::after {
+            content: '';
+            position: absolute;
+            inset: 0;
+            background-image: repeating-linear-gradient(
+                to bottom,
+                transparent 0px,
+                transparent 120px,
+                rgba(122, 191, 117, 0.6) 120px,
+                rgba(122, 191, 117, 0.6) 124px,
+                #4d7a4a 124px,
+                #4d7a4a 128px
+            );
+            opacity: 0.9;
+        }
+        .stalk.s1 { left: 20%; animation: sway 8s ease-in-out infinite; }
+        .stalk.s2 { left: 50%; animation: sway 10s ease-in-out infinite reverse; }
+        .stalk.s3 { left: 78%; animation: sway 12s ease-in-out infinite; }
+        .stalk.s1,
+        .stalk.s2,
+        .stalk.s3 { cursor: pointer; pointer-events: auto; }
+
+        @keyframes sway {
+            0%, 100% { transform: rotate(0deg) translateY(-5%); }
+            50% { transform: rotate(1deg) translateY(0%); }
+        }
+
+        .card {
+            position: relative;
+            max-width: 520px;
+            width: 90%;
+            padding: 32px;
+            background: var(--card);
+            border: 1px solid rgba(122, 191, 117, 0.25);
+            border-radius: 16px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.35);
+            backdrop-filter: blur(6px);
+            z-index: 1;
+        }
+        .eyebrow {
+            display: inline-block;
+            font-family: monospace;
+            font-size: 0.8rem;
+            color: var(--sub);
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+        }
+        h1 {
+            font-size: 3rem;
+            line-height: 1.1;
+            margin-bottom: 12px;
+        }
+        .lead {
+            color: var(--sub);
+            margin-bottom: 20px;
+        }
+        .steps {
+            list-style: decimal-leading-zero;
+            padding-left: 20px;
+            color: var(--text);
+            display: grid;
+            gap: 8px;
+            margin-bottom: 24px;
+        }
+        .steps span {
+            color: var(--sub);
+            font-size: 0.9rem;
+        }
+        .actions {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 10px 16px;
+            border-radius: 12px;
+            text-decoration: none;
+            font-weight: 700;
+            border: 1px solid rgba(122, 191, 117, 0.4);
+            color: var(--text);
+            transition: transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+            background: linear-gradient(135deg, rgba(122, 191, 117, 0.15), rgba(122, 191, 117, 0.05));
+        }
+        .btn:hover {
+            transform: translateY(-2px);
+            border-color: var(--accent);
+            box-shadow: 0 10px 30px rgba(122, 191, 117, 0.2);
+        }
+        .glitch {
+            position: absolute;
+            inset: 12px;
+            border-radius: 12px;
+            border: 1px dashed rgba(122, 191, 117, 0.15);
+            mix-blend-mode: screen;
+            animation: pulse 3s ease-in-out infinite;
+            pointer-events: none;
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 0.35; transform: scale(1); }
+            50% { opacity: 0.6; transform: scale(1.01); }
+        }
+        .code-line {
+            font-family: monospace;
+            color: var(--sub);
+            font-size: 0.9rem;
+            margin-top: 8px;
+        }
+        .code-line strong { color: var(--accent); }
+    </style>
+</head>
+<body>
+    <div class="grid"></div>
+    <div class="bamboo">
+        <div class="stalk s1"></div>
+        <div class="stalk s2"></div>
+        <div class="stalk s3"></div>
+    </div>
+
+    <div class="card">
+        <div class="glitch"></div>
+        <div class="eyebrow">// 404: This page is NotFound</div>
+        <h1>Oops, 迷子になったみたい</h1>
+        <p class="lead">探しているページは見つからなかったよ。URLをもう一度チェックするか、ホームに戻ってね。</p>
+
+        <ol class="steps">
+            <li>URLのスペルを確認する <span>(余計なスラッシュやタイプミスがないか)</span></li>
+            <li>トップに戻る <span>(Menuからたどり直す)</span></li>
+            <li>それでもダメなら連絡してね <span>(下にコンタクトリンクがあるよ)</span></li>
+        </ol>
+
+        <div class="actions">
+            <a class="btn" href="/">ホームに戻る</a>
+            <a class="btn" href="/#contact">問い合わせる</a>
+        </div>
+
+        <div class="code-line">Tips: 背景の<strong>竹</strong> をクリックすると何かが、、、？</div>
+    </div>
+
+    <script>
+        const tips = [
+            "ばんぶーは燃えやすい🔥だから突然いなくなる",
+            "ページがない？お前のせいやろ。",
+            "しょーもないエラーで良かったわ。。。",
+            "ここに書くものなにか募集",
+            "推し活をしているとなにか大切なものを失った気がする。"
+        ];
+
+        const stalks = document.querySelectorAll('.stalk');
+        const codeLine = document.querySelector('.code-line');
+
+        function randomTip() {
+            return tips[Math.floor(Math.random() * tips.length)];
+        }
+
+        function popConfetti(x, y) {
+            const burst = document.createElement('div');
+            burst.style.position = 'fixed';
+            burst.style.left = `${x}px`;
+            burst.style.top = `${y}px`;
+            burst.style.pointerEvents = 'none';
+            burst.style.width = '6px';
+            burst.style.height = '6px';
+            burst.style.borderRadius = '50%';
+            burst.style.background = 'rgba(122,191,117,0.9)';
+            burst.style.boxShadow = '0 0 12px rgba(122,191,117,0.7)';
+            burst.animate(
+                [
+                    { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+                    { transform: 'translate(-50%, -100px) scale(0)', opacity: 0 }
+                ],
+                { duration: 700, easing: 'ease-out' }
+            );
+            document.body.appendChild(burst);
+            setTimeout(() => burst.remove(), 800);
+        }
+
+        stalks.forEach(stalk => {
+            stalk.style.cursor = 'pointer';
+            stalk.style.pointerEvents = 'auto';
+            stalk.addEventListener('click', (e) => {
+                codeLine.textContent = randomTip();
+                popConfetti(e.clientX, e.clientY);
+            });
+        });
+    </script>
+</body>
+</html>
