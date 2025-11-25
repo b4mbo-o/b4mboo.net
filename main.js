@@ -112,41 +112,40 @@ async function fetchNotes() {
     // Astroのビルドで生成されるRSSは feed.xml なので明示的に参照する
     const BLOG_RSS_URL = 'https://notes.b4mboo.net/feed.xml'; 
 
-    // RSS to JSON Converter (CORS回避のため rss2json.com を利用)
-    const API_ENDPOINT = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS_URL)}`;
-
     try {
-        const response = await fetch(API_ENDPOINT);
-        const data = await response.json();
+        const response = await fetch(BLOG_RSS_URL, { headers: { 'Accept': 'application/xml' } });
+        if (!response.ok) throw new Error(`HTTP ${response.status}`);
+        const xmlText = await response.text();
 
-        if (data.status === 'ok' && data.items.length > 0) {
-            container.innerHTML = ''; // Loading表示を消す
+        const parser = new DOMParser();
+        const doc = parser.parseFromString(xmlText, 'application/xml');
+        const items = Array.from(doc.querySelectorAll('item'));
 
-            // 最新3件を表示
-            data.items.slice(0, 3).forEach(item => {
-                // 日付の整形
-                const date = new Date(item.pubDate).toLocaleDateString('ja-JP');
-                
-                // カードHTMLの生成
-                const cardHTML = `
-                    <a href="${item.link}" target="_blank" class="card link-card">
-                        <div class="card-top">
-                            <span class="service-name" style="font-size: 1rem;">${item.title}</span>
-                            <span class="status-dot"></span>
-                        </div>
-                        <p class="service-desc" style="margin-top: 10px;">${date}</p>
-                        <div class="card-footer">notes.b4mboo.net</div>
-                    </a>
-                `;
-                container.innerHTML += cardHTML;
-            });
-            
-            // 新しく挿入したカードにもエフェクトを付与
-            applyCardTilt();
-        } else {
-            // 記事がない、または取得エラーの場合（まだブログがない時など）
-            throw new Error('No items found');
-        }
+        if (items.length === 0) throw new Error('No items found in feed');
+
+        container.innerHTML = ''; // Loading表示を消す
+
+        items.slice(0, 3).forEach(item => {
+            const title = item.querySelector('title')?.textContent || 'No title';
+            const link = item.querySelector('link')?.textContent || '#';
+            const pubDate = item.querySelector('pubDate')?.textContent || '';
+            const date = pubDate ? new Date(pubDate).toLocaleDateString('ja-JP') : '';
+
+            const cardHTML = `
+                <a href="${link}" target="_blank" class="card link-card">
+                    <div class="card-top">
+                        <span class="service-name" style="font-size: 1rem;">${title}</span>
+                        <span class="status-dot"></span>
+                    </div>
+                    <p class="service-desc" style="margin-top: 10px;">${date}</p>
+                    <div class="card-footer">notes.b4mboo.net</div>
+                </a>
+            `;
+            container.innerHTML += cardHTML;
+        });
+
+        // 新しく挿入したカードにもエフェクトを付与
+        applyCardTilt();
     } catch (error) {
         console.log("Blog fetch failed (maybe blog is not ready yet):", error);
         // エラー時は「Coming Soon」のままにしておくか、メッセージを変える
