@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>500 | b4mboo.net</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600;800&family=Zen+Kaku+Gothic+New:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root { --bg:#090d0a; --card:rgba(10,14,10,0.88); --accent:#7abf75; --text:#e6f0e6; --sub:#8aa08a; }
+        * { margin:0; padding:0; box-sizing:border-box; }
+        body {
+            min-height:100vh; display:flex; align-items:center; justify-content:center;
+            background: radial-gradient(circle at 25% 25%, rgba(122,191,117,0.08), transparent 30%),
+                        radial-gradient(circle at 80% 20%, rgba(122,191,117,0.05), transparent 25%),
+                        linear-gradient(135deg,#050805,#0c140c 55%,#030503);
+            font-family:'Manrope','Zen Kaku Gothic New',sans-serif; color:var(--text); overflow:hidden;
+        }
+        .card {
+            position:relative; max-width:540px; width:90%; padding:34px;
+            background:var(--card); border:1px solid rgba(122,191,117,0.25); border-radius:16px;
+            box-shadow:0 22px 70px rgba(0,0,0,0.4); backdrop-filter:blur(7px);
+        }
+        .eyebrow { font-family:monospace; font-size:0.8rem; color:var(--sub); letter-spacing:2px; text-transform:uppercase; margin-bottom:12px; display:inline-block; }
+        h1 { font-size:2.7rem; line-height:1.1; margin-bottom:12px; }
+        .lead { color:var(--sub); margin-bottom:18px; }
+        .log {
+            background: rgba(255,255,255,0.02);
+            border: 1px dashed rgba(122,191,117,0.2);
+            border-radius: 12px;
+            padding: 12px;
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: var(--sub);
+            margin-bottom: 18px;
+            line-height: 1.5;
+        }
+        .actions { display:flex; gap:12px; flex-wrap:wrap; }
+        .btn {
+            display:inline-flex; align-items:center; gap:8px; padding:10px 16px; border-radius:12px;
+            text-decoration:none; font-weight:700; border:1px solid rgba(122,191,117,0.4); color:var(--text);
+            background:linear-gradient(135deg,rgba(122,191,117,0.15),rgba(122,191,117,0.05));
+            transition:transform 0.2s ease, box-shadow 0.2s ease, border-color 0.2s ease;
+        }
+        .btn:hover { transform:translateY(-2px); border-color:var(--accent); box-shadow:0 10px 30px rgba(122,191,117,0.2); }
+        .code-line { font-family:monospace; color:var(--sub); font-size:0.9rem; margin-top:12px; }
+    </style>
+</head>
+<body>
+    <div class="card">
+        <div class="eyebrow">// 500: Internal error</div>
+        <h1>サーバーが竹を踏んで転んだ</h1>
+        <p class="lead">ごめん、いま裏側でエラーが起きてるみたい。少し待ってリロードするか、連絡してね。</p>
+        <div class="log">
+            [log] panic: bamboo stalk slipped<br>
+            [hint] reload か 管理人に ping してね<br>
+            [trace] /forest/bamboo/stacktrace
+        </div>
+        <div class="actions">
+            <a class="btn" href="/">ホームに戻る</a>
+            <a class="btn" href="javascript:location.reload()">リロードする</a>
+            <a class="btn" href="/#contact">問い合わせる</a>
+        </div>
+        <div class="code-line">hint: 直らない場合は <strong>contact@b4mboo.net</strong> へ。</div>
+    </div>
+</body>
+</html>
