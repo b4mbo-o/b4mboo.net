@@ -107,11 +107,10 @@ async function fetchNotes() {
     const container = document.getElementById('notes-container');
     if (!container) return;
 
-    // ★設定: ここにブログのRSSフィードURLを入れる
-    // 例: WordPressなら 'https://note.b4mboo.net/feed'
-    // 例: Zennなら 'https://zenn.dev/b4mboo/feed'
-    // 今はダミーURLにしているので、ブログを作ったら書き換えてください
-    const BLOG_RSS_URL = 'https://note.b4mboo.net/feed'; 
+    // ★設定: ブログのRSSフィードURL
+    // notes.b4mboo.net で生成したフィードを参照します
+    // Astroのビルドで生成されるRSSは feed.xml なので明示的に参照する
+    const BLOG_RSS_URL = 'https://notes.b4mboo.net/feed.xml'; 
 
     // RSS to JSON Converter (CORS回避のため rss2json.com を利用)
     const API_ENDPOINT = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(BLOG_RSS_URL)}`;
@@ -136,7 +135,7 @@ async function fetchNotes() {
                             <span class="status-dot"></span>
                         </div>
                         <p class="service-desc" style="margin-top: 10px;">${date}</p>
-                        <div class="card-footer">note.b4mboo.net</div>
+                        <div class="card-footer">notes.b4mboo.net</div>
                     </a>
                 `;
                 container.innerHTML += cardHTML;
