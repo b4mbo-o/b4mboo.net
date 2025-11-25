@@ -72,7 +72,6 @@ body {
     color: var(--text-main);
     line-height: 1.6;
     overflow-x: hidden;
-    cursor: none;
 }
 
 /* --- Layout Structure --- */
@@ -165,10 +164,6 @@ body {
 .card.locked { opacity: 0.6; cursor: pointer; }
 .card.locked:hover { opacity: 1; border-color: var(--text-sub); }
 
-/* --- Cursor --- */
-.cursor-dot { width: 8px; height: 8px; background: var(--bamboo-green); position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; }
-.cursor-outline { width: 40px; height: 40px; border: 1px solid var(--bamboo-green); position: fixed; border-radius: 50%; pointer-events: none; z-index: 9999; transition: width 0.2s, height 0.2s; opacity: 0.5; }
-
 /* --- Theme Button --- */
 .theme-btn {
     background: transparent; border: 1px solid var(--card-border);
@@ -250,6 +245,4 @@ button { padding: 8px 24px; border-radius: 4px; font-size: 0.8rem; font-weight: 
 
     .main-content { width: 100%; margin-left: 0; padding: 30px 20px 80px; }
     .bamboo-bg { right: -20px; opacity: 0.3; }
-    .cursor-dot, .cursor-outline { display: none; }
-    body { cursor: auto; }
 }

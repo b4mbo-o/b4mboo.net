@@ -2,69 +2,28 @@ document.addEventListener('DOMContentLoaded', () => {
     
     /* --- 1. テーマ切り替え --- */
     const themeBtn = document.getElementById('theme-toggle');
+    const setTheme = (nextTheme) => {
+        document.body.setAttribute('data-theme', nextTheme);
+        localStorage.setItem('theme', nextTheme);
+        if (themeBtn) themeBtn.setAttribute('aria-pressed', nextTheme === 'dark' ? 'true' : 'false');
+    };
+
     const savedTheme = localStorage.getItem('theme');
-    if (savedTheme) {
-        document.body.setAttribute('data-theme', savedTheme);
-    }
+    const initialTheme = savedTheme || document.body.getAttribute('data-theme') || 'dark';
+    setTheme(initialTheme);
 
     if (themeBtn) {
         themeBtn.addEventListener('click', () => {
             const currentTheme = document.body.getAttribute('data-theme');
-            if (currentTheme === 'light') {
-                document.body.setAttribute('data-theme', 'dark');
-                localStorage.setItem('theme', 'dark');
-            } else {
-                document.body.setAttribute('data-theme', 'light');
-                localStorage.setItem('theme', 'light');
-            }
+            const nextTheme = currentTheme === 'light' ? 'dark' : 'light';
+            setTheme(nextTheme);
         });
     }
 
-    /* --- 2. カスタムカーソル --- */
-    const cursorDot = document.getElementById('cursor-dot');
-    const cursorOutline = document.getElementById('cursor-outline');
+    // カスタムカーソルは削除しました
 
-    if (window.matchMedia("(pointer: fine)").matches && cursorDot && cursorOutline) {
-        window.addEventListener('mousemove', (e) => {
-            const posX = e.clientX;
-            const posY = e.clientY;
-            cursorDot.style.left = `${posX}px`;
-            cursorDot.style.top = `${posY}px`;
-            cursorOutline.animate({ left: `${posX}px`, top: `${posY}px` }, { duration: 500, fill: "forwards" });
-        });
-
-        const interactiveElements = document.querySelectorAll('a, .card, button');
-        interactiveElements.forEach(el => {
-            el.addEventListener('mouseenter', () => {
-                cursorOutline.style.transform = "translate(-50%, -50%) scale(1.5)";
-                cursorOutline.style.backgroundColor = "var(--bamboo-glow)";
-                cursorOutline.style.borderColor = "transparent";
-            });
-            el.addEventListener('mouseleave', () => {
-                cursorOutline.style.transform = "translate(-50%, -50%) scale(1)";
-                cursorOutline.style.backgroundColor = "transparent";
-                cursorOutline.style.borderColor = "var(--bamboo-green)";
-            });
-        });
-    }
-
-    /* --- 3. 3Dカードチルト --- */
-    const cards = document.querySelectorAll('.link-card');
-    cards.forEach(card => {
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -4;
-            const rotateY = ((x - centerX) / centerX) * 4;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-        });
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-        });
-    });
+    /* --- 2. 3Dカードチルト --- */
+    applyCardTilt();
 
     /* --- 5. Blog Feed Fetcher (New!) --- */
     fetchNotes();
@@ -118,6 +77,31 @@ passInput.addEventListener('keypress', (e) => {
 });
 
 
+/* --- Utility: カードのチルト効果を付与 --- */
+function applyCardTilt() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+
+    document.querySelectorAll('.link-card').forEach(card => {
+        if (card.dataset.tiltBound === '1') return;
+        card.dataset.tiltBound = '1';
+
+        card.addEventListener('mousemove', (e) => {
+            const rect = card.getBoundingClientRect();
+            const x = e.clientX - rect.left;
+            const y = e.clientY - rect.top;
+            const centerX = rect.width / 2;
+            const centerY = rect.height / 2;
+            const rotateX = ((y - centerY) / centerY) * -4;
+            const rotateY = ((x - centerX) / centerX) * 4;
+            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
+        });
+
+        card.addEventListener('mouseleave', () => {
+            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
+        });
+    });
+}
+
 /* --- 5. Notes (Blog) Fetcher Logic --- */
 async function fetchNotes() {
     const container = document.getElementById('notes-container');
@@ -158,8 +142,8 @@ async function fetchNotes() {
                 container.innerHTML += cardHTML;
             });
             
-            // カードにマウスイベントを再適用（チルトエフェクトなど）
-            // ※ 簡易的に再リロードさせるか、単純にリンクとして機能させる
+            // 新しく挿入したカードにもエフェクトを付与
+            applyCardTilt();
         } else {
             // 記事がない、または取得エラーの場合（まだブログがない時など）
             throw new Error('No items found');
@@ -174,6 +158,3 @@ async function fetchNotes() {
         `;
     }
 }
-javascript
-// ★設定: ここにブログのRSSフィードURLを入れる
-const BLOG_RSS_URL = 'https://note.b4mboo.net/feed'; // ←ここを正しいRSSのURLにする
