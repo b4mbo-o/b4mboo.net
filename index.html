@@ -127,18 +127,38 @@
             </section>
 
             <!-- Works Section -->
+            <!-- Works Section -->
             <section id="works" class="content-section">
                 <h2 class="section-title">01_Works (Public)</h2>
-                <div class="grid-wrapper">
-                    <a href="https://github.com/b4mbo-o/tanuki-notify" target="_blank" class="card link-card">
+                <div class="grid-wrapper works-grid">
+                    <div class="card link-card" onclick="window.open('image-bot.html', '_blank')" style="cursor: pointer;">
+                        <div class="card-top">
+                            <span class="service-name">小晴のか画像bot</span>
+                            <span class="status-dot"></span>
+                        </div>
+                        <p class="service-desc">小晴のかの画像を収集し、自動でツイートします。</p>
+                        <div class="card-footer">
+                            <a class="icon-link" href="https://github.com/b4mbo-o/image-bot" target="_blank" onclick="event.stopPropagation()" aria-label="GitHub">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                            </a>
+                            <a class="icon-link" href="https://twitter.com/noka_archive" target="_blank" onclick="event.stopPropagation()" aria-label="Twitter">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M22 4s-.7 2.1-2 3.4c1.6 10-9.4 17.3-18 11.6 2.2.1 4.4-.6 6-2C3 15.5.5 9.6 3 5c2.2 2.6 5.6 4.1 9 4-.9-4.2 4-6.6 7-3.8 1.1 0 3-1.2 3-1.2z"></path></svg>
+                            </a>
+                        </div>
+                    </div>
+
+                    <div class="card link-card" onclick="window.open('https://github.com/b4mbo-o/tanuki-notify', '_blank')" style="cursor: pointer;">
                         <div class="card-top">
                             <span class="service-name">Tanuki Notify</span>
+                            <span class="status-dot"></span>
                         </div>
                         <p class="service-desc">たぬきに晒されたらツイートされます(^_^;)</p>
-                        <div class="card-footer" style="display:flex; justify-content:flex-end; align-items:center; gap:6px;">
-                            <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                        <div class="card-footer">
+                            <a class="icon-link" href="https://github.com/b4mbo-o/tanuki-notify" target="_blank" onclick="event.stopPropagation()" aria-label="GitHub">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
+                            </a>
                         </div>
-                    </a>
+                    </div>
 
                     <div class="card link-card" onclick="window.open('https://bot.b4mboo.net', '_blank')" style="cursor: pointer;">
                         <div class="card-top">
@@ -146,9 +166,8 @@
                             <span class="status-dot"></span>
                         </div>
                         <p class="service-desc">Hashtag Auto-Poster</p>
-                        <div class="card-footer" style="display: flex; justify-content: space-between; align-items: center;">
-                            <span>bot.b4mboo.net</span>
-                            <a href="https://github.com/b4mbo-o/oshikatsu" target="_blank" onclick="event.stopPropagation()" style="color: inherit; display: flex; align-items: center;">
+                        <div class="card-footer">
+                            <a class="icon-link" href="https://github.com/b4mbo-o/oshikatsu" target="_blank" onclick="event.stopPropagation()" aria-label="GitHub">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 19c-5 1.5-5-2.5-7-3m14 6v-3.87a3.37 3.37 0 0 0-.94-2.61c3.14-.35 6.44-1.54 6.44-7A5.44 5.44 0 0 0 20 4.77 5.07 5.07 0 0 0 19.91 1S18.73.65 16 2.48a13.38 13.38 0 0 0-7 0C6.27.65 5.09 1 5.09 1A5.07 5.07 0 0 0 5 4.77a5.44 5.44 0 0 0-1.5 3.78c0 5.42 3.3 6.61 6.44 7A3.37 3.37 0 0 0 9 18.13V22"></path></svg>
                             </a>
                         </div>
