@@ -435,9 +435,10 @@
         <div class="success-lead">大声チケットで会場へ！</div>
         <div class="cta-buttons">
             <a class="cta-button" id="ticketLink" href="https://ticketdive.com/event/bakuonsai_0323" target="_blank" rel="noopener">🎫 大声チケット購入はこちら！</a>
+            <a class="ghost-button" id="shareBtn" href="#" target="_blank" rel="noopener">𝕏 でシェア</a>
             <button class="ghost-button" id="closeOverlayBtn">✖ 閉じる / 続けて計測</button>
         </div>
-        <div class="note overlay-note">※ 数値はあくまで目安です。スコアをスクショしてシェアしてね！</div>
+        <div class="note overlay-note">※ 数値はあくまで目安です。Xにスコア付きで共有できます。</div>
     </div>
 
     <script>
@@ -450,6 +451,7 @@
         const calibrationRange = document.getElementById('calibrationRange');
         const calibrationValue = document.getElementById('calibrationValue');
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        const shareBtn = document.getElementById('shareBtn');
         const CAL_STORAGE_KEY = 'bakuon_cal_offset';
         const SUCCESS_THRESHOLD = 100; // 成功判定を始める閾値
         const HOLD_THRESHOLD = 90; // 成功後、ここを下回ったら終了カウント
@@ -465,6 +467,7 @@
         let successLocked = false;
         let quietCount = 0;
         let hasHitSuccessThreshold = false;
+        let latestShareUrl = '';
 
         function getDbFromFloatArray(floatArray) {
             let sumSquares = 0;
@@ -474,7 +477,7 @@
             }
             const rms = Math.sqrt(sumSquares / floatArray.length) || 1e-8;
             const dbfs = 20 * Math.log10(rms); // 0dBFS基準
-            const spl = Math.round(Math.max(0, Math.min(130, dbfs + calibrationOffset)));
+            const spl = Math.round(Math.max(0, Math.min(150, dbfs + calibrationOffset)));
             return spl;
         }
 
@@ -489,6 +492,9 @@
             successLocked = true;
             successOverlay.style.display = 'flex';
             resultMax.textContent = maxDb;
+            const { intentUrl, shareUrl } = buildShareLinks(maxDb);
+            latestShareUrl = shareUrl;
+            shareBtn.href = intentUrl;
             stopMeasurement();
         }
 
@@ -506,6 +512,16 @@
                 }
             }
             updateCalibrationDisplay();
+        }
+
+        function buildShareLinks(score) {
+            const shareUrl = new URL(window.location.href.split('#')[0]);
+            shareUrl.searchParams.set('score', score); // 共有リンクにスコアを埋め込む
+            const intent = new URL('https://twitter.com/intent/tweet');
+            const text = `${score}dBのバカ大声！📣🗯\n`;
+            intent.searchParams.set('text', `${text}\n${shareUrl.toString()}\n\n`);
+            intent.searchParams.set('hashtags', 'MEGAFON,爆音祭,バカ大声チャレンジ');
+            return { intentUrl: intent.toString(), shareUrl: shareUrl.toString() };
         }
 
         function stopMeasurement() {
@@ -537,6 +553,13 @@
 
         function handleCloseOverlay() {
             successOverlay.style.display = 'none';
+        }
+
+        function handleShareClick(e) {
+            if (!shareBtn.href || shareBtn.href === '#') {
+                e.preventDefault();
+                alert('まだスコアがありません。計測してからシェアしてください。');
+            }
         }
 
         calibrationRange.addEventListener('input', (e) => {
@@ -624,6 +647,7 @@
 
         startBtn.addEventListener('click', startMeasurement);
         closeOverlayBtn.addEventListener('click', handleCloseOverlay);
+        shareBtn.addEventListener('click', handleShareClick);
         loadCalibration();
     </script>
 </body>
