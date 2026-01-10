@@ -1,0 +1,606 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>MEGAFON バカ大声チャレンジ 100dB!!</title>
+    <style>
+        /* --- デザイン設定 --- */
+        :root {
+            --mega-pink: #ff00ff;
+            --mega-yellow: #ffff00;
+            --mega-black: #111;
+            --mega-white: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: "Helvetica Neue", Arial, "Hiragino Kaku Gothic ProN", "Hiragino Sans", sans-serif;
+            background-color: var(--mega-black);
+            color: var(--mega-white);
+            margin: 0;
+            padding: 0;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh; /* heightからmin-heightに変更 */
+            overflow-x: hidden;
+            overflow-y: auto; /* 小さい画面で縦スクロールを許可 */
+            overscroll-behavior: contain;
+            background-image: repeating-linear-gradient(
+                45deg,
+                #1a1a1a,
+                #1a1a1a 10px,
+                #111 10px,
+                #111 20px
+            );
+            /* スマホでのバウンス防止 */
+            touch-action: manipulation; 
+        }
+
+        /* コンテンツ全体を中央寄せするためのラッパー */
+        .main-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            width: 100%;
+            min-height: 100vh;
+            height: auto;
+            padding: 20px;
+        }
+
+        h1 {
+            font-size: clamp(2rem, 8vw, 3.5rem); /* レスポンシブ文字サイズ */
+            text-transform: uppercase;
+            color: var(--mega-yellow);
+            text-shadow: 4px 4px 0px var(--mega-pink);
+            margin: 0 0 10px 0;
+            font-style: italic;
+            text-align: center;
+            line-height: 1.1;
+            white-space: nowrap;
+        }
+
+        .subtitle {
+            font-size: clamp(0.8rem, 4vw, 1.2rem);
+            color: var(--mega-white);
+            background: var(--mega-pink);
+            padding: 5px 15px;
+            transform: skew(-10deg);
+            margin-bottom: 20px;
+            font-weight: bold;
+            text-align: center;
+        }
+
+        /* メーター周り */
+        .meter-container {
+            width: 100%;
+            max-width: 350px;
+            height: 45vh; /* 画面高さの45% */
+            max-height: 500px;
+            min-height: 260px;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            border: 4px solid var(--mega-white);
+            border-radius: 20px;
+            background: rgba(0,0,0,0.8);
+            box-shadow: 0 0 20px var(--mega-pink);
+            margin-bottom: 20px;
+            overflow: hidden;
+        }
+
+        .db-display {
+            font-size: clamp(4rem, 15vw, 6rem);
+            font-weight: 900;
+            font-family: 'Courier New', monospace;
+            z-index: 2;
+            line-height: 1;
+        }
+
+        .unit {
+            font-size: 1.5rem;
+            color: var(--mega-pink);
+            z-index: 2;
+            font-weight: bold;
+        }
+
+        /* MAX表示 */
+        .max-display {
+            position: absolute;
+            top: 15px;
+            right: 15px;
+            font-family: 'Courier New', monospace;
+            font-size: 1.2rem;
+            color: var(--mega-yellow);
+            z-index: 2;
+            border-bottom: 2px solid var(--mega-yellow);
+        }
+
+        /* 視覚的なバー */
+        .volume-bar-bg {
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 0%;
+            background: linear-gradient(to top, var(--mega-pink), var(--mega-yellow));
+            opacity: 0.6;
+            transition: height 0.05s ease-out; /* 反応を少し鋭敏に */
+            z-index: 1;
+        }
+
+        /* スタートボタン */
+        #startBtn {
+            padding: 15px 40px;
+            font-size: 1.5rem;
+            font-weight: bold;
+            background-color: var(--mega-yellow);
+            color: var(--mega-black);
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            box-shadow: 0 6px 0 var(--mega-pink);
+            transition: all 0.1s;
+            /* スマホで押しやすく */
+            width: 80%;
+            max-width: 300px;
+        }
+
+        #startBtn:active {
+            transform: translateY(4px);
+            box-shadow: 0 2px 0 var(--mega-pink);
+        }
+
+        /* 成功時のオーバーレイアニメーション */
+        #successOverlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 0, 255, 0.95);
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            z-index: 999;
+            animation: flash 0.2s infinite;
+            padding: 20px;
+            text-align: center;
+        }
+
+        .success-text {
+            font-size: clamp(3rem, 12vw, 5rem);
+            font-weight: 900;
+            color: var(--mega-yellow);
+            text-stroke: 2px black;
+            -webkit-text-stroke: 3px black;
+            transform: rotate(-5deg);
+            margin-bottom: 10px;
+            animation: boom 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+        }
+
+        .result-score {
+            font-size: 2rem;
+            font-weight: bold;
+            color: var(--mega-black);
+            background: var(--mega-white);
+            padding: 5px 20px;
+            margin: 20px 0 5px 0;
+            border: 3px solid black;
+            transform: rotate(2deg);
+        }
+
+        .success-lead {
+            color: var(--mega-white);
+            font-weight: bold;
+            margin: 6px 0 12px;
+        }
+
+        .cta-buttons {
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            justify-content: center;
+            margin-bottom: 10px;
+        }
+
+        .cta-button,
+        .ghost-button {
+            padding: 10px 18px;
+            border-radius: 999px;
+            font-weight: bold;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: none;
+            cursor: pointer;
+        }
+
+        .cta-button {
+            background: var(--mega-yellow);
+            color: var(--mega-black);
+            box-shadow: 0 5px 0 var(--mega-black);
+        }
+
+        .ghost-button {
+            background: rgba(0,0,0,0.15);
+            border: 2px solid var(--mega-white);
+            color: var(--mega-white);
+        }
+
+        .note {
+            font-size: 0.8rem;
+            color: var(--mega-white);
+            opacity: 0.9;
+            text-align: center;
+            margin-top: 10px;
+            line-height: 1.4;
+        }
+
+        .overlay-note {
+            color: var(--mega-black);
+            font-weight: bold;
+            opacity: 0.95;
+        }
+
+        /* オーバーレイのアイコン */
+        .boom-icon {
+            font-size: clamp(2rem, 8vw, 4rem);
+            color: var(--mega-white);
+            margin-bottom: 10px;
+            animation: shake 0.4s infinite alternate;
+        }
+
+        /* キービジュアルエリア */
+        .visual {
+            width: 100%;
+            max-width: 320px;
+            height: 150px;
+            background: linear-gradient(135deg, rgba(255,0,255,0.3), rgba(255,255,0,0.3));
+            border: 3px solid var(--mega-white);
+            border-radius: 12px;
+            box-shadow: 0 0 10px var(--mega-pink);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--mega-white);
+            font-size: 1.2rem;
+            text-align: center;
+            margin-bottom: 20px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .visual::after {
+            content: "";
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(0,0,0,0) 60%);
+            animation: rotate 10s linear infinite;
+        }
+
+        /* フッター */
+        .footer {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: #ccc;
+            text-align: center;
+        }
+
+        .calibration {
+            width: 100%;
+            max-width: 360px;
+            background: rgba(255, 255, 255, 0.04);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            border-radius: 14px;
+            padding: 14px 16px 10px;
+            margin: 14px 0 6px;
+            box-shadow: 0 6px 16px rgba(0,0,0,0.35);
+        }
+
+        .calibration-title {
+            font-weight: bold;
+            color: var(--mega-yellow);
+            margin-bottom: 8px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 0.95rem;
+        }
+
+        .calibration small {
+            color: #bbb;
+            line-height: 1.4;
+        }
+
+        .calibration-control {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 6px;
+        }
+
+        .calibration input[type="range"] {
+            flex: 1;
+            accent-color: var(--mega-pink);
+        }
+
+        .cal-value {
+            min-width: 62px;
+            text-align: right;
+            font-family: 'Courier New', monospace;
+            color: var(--mega-white);
+            background: rgba(0,0,0,0.3);
+            padding: 4px 8px;
+            border-radius: 8px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+
+        /* アニメーション */
+        @keyframes flash {
+            0% { background: rgba(255,0,255,0.9); }
+            50% { background: rgba(255,255,0,0.9); }
+            100% { background: rgba(255,0,255,0.9); }
+        }
+
+        @keyframes boom {
+            from { transform: scale(0.6) rotate(-10deg); opacity: 0; }
+            to { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+
+        @keyframes shake {
+            from { transform: translateX(-5px) rotate(-5deg); }
+            to { transform: translateX(5px) rotate(5deg); }
+        }
+
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+
+        /* SP向け微調整 */
+        @media (max-width: 480px) {
+            .meter-container {
+                max-width: 90%;
+            }
+        }
+
+        /* 画面が低い端末向け (例: iPhone SE) */
+        @media (max-height: 700px) {
+            body {
+                justify-content: flex-start;
+            }
+            .main-wrapper {
+                padding-top: 24px;
+                padding-bottom: 48px;
+            }
+            .meter-container {
+                height: 40vh;
+                min-height: 220px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="main-wrapper">
+        <h1>MEGAFON</h1>
+        <div class="subtitle">バカ大声チャレンジ 100dB!!</div>
+
+        <div class="visual">
+            🔊 爆音で<span style="color: var(--mega-yellow); font-weight: bold; margin: 0 6px;">100dB</span>超えろ！
+        </div>
+
+        <div class="meter-container">
+            <div class="max-display">MAX <span id="maxValue">0</span> dB</div>
+            <div class="db-display" id="dbValue">0</div>
+            <div class="unit">dB</div>
+            <div class="volume-bar-bg" id="volumeBar"></div>
+        </div>
+
+        <button id="startBtn">計測スタート！</button>
+
+        <div class="calibration">
+            <div class="calibration-title">🎚 校正（dBオフセット）</div>
+            <div class="calibration-control">
+                <input type="range" id="calibrationRange" min="80" max="140" step="1" value="100">
+                <div class="cal-value"><span id="calibrationValue">100</span> dB</div>
+            </div>
+            <small>既知の音源（例: 1kHz 94dBトーン）や騒音計アプリと並べて値が合うようスライダーで調整。</small>
+        </div>
+
+        <div class="note">
+            マイク許可をオンにして<br>叫ぶ / コール / 推しへの愛🧡 などで挑戦してね。<br>
+            100dB超えたらド派手な演出が走るよ！
+        </div>
+    </div>
+
+    <!-- 成功時オーバーレイ -->
+    <div id="successOverlay">
+        <div class="boom-icon">💥💥💥</div>
+        <div class="success-text">バカ大声〜‼️</div>
+        <div class="result-score">記録: <span id="resultMax">0</span> dB</div>
+        <div class="success-lead">大声チケットで会場へ！</div>
+        <div class="cta-buttons">
+            <a class="cta-button" id="ticketLink" href="https://ticketdive.com/event/bakuonsai_0323" target="_blank" rel="noopener">🎫 大声チケット購入はこちら！</a>
+            <button class="ghost-button" id="closeOverlayBtn">✖ 閉じる / 続けて計測</button>
+        </div>
+        <div class="note overlay-note">※ 数値はあくまで目安です。スコアをスクショしてシェアしてね！</div>
+    </div>
+
+    <script>
+        const dbValue = document.getElementById('dbValue');
+        const maxValue = document.getElementById('maxValue');
+        const volumeBar = document.getElementById('volumeBar');
+        const startBtn = document.getElementById('startBtn');
+        const successOverlay = document.getElementById('successOverlay');
+        const resultMax = document.getElementById('resultMax');
+        const calibrationRange = document.getElementById('calibrationRange');
+        const calibrationValue = document.getElementById('calibrationValue');
+        const closeOverlayBtn = document.getElementById('closeOverlayBtn');
+        const CAL_STORAGE_KEY = 'bakuon_cal_offset';
+
+        let audioContext;
+        let analyser;
+        let microphone;
+        let javascriptNode;
+        let maxDb = 0;
+        let measuring = false;
+        let calibrationOffset = Number(calibrationRange.value); // dBFS -> dB SPL 仮変換
+        let successLocked = false;
+
+        function getDbFromFloatArray(floatArray) {
+            let sumSquares = 0;
+            for (let i = 0; i < floatArray.length; i++) {
+                const val = floatArray[i];
+                sumSquares += val * val;
+            }
+            const rms = Math.sqrt(sumSquares / floatArray.length) || 1e-8;
+            const dbfs = 20 * Math.log10(rms); // 0dBFS基準
+            const spl = Math.round(Math.max(0, Math.min(130, dbfs + calibrationOffset)));
+            return spl;
+        }
+
+        function updateVisual(db) {
+            dbValue.textContent = db;
+            if (db > maxDb) {
+                maxDb = db;
+                maxValue.textContent = maxDb;
+                if (maxDb >= 100) {
+                    triggerSuccess();
+                }
+            }
+            const height = Math.min(100, db) + '%';
+            volumeBar.style.height = height;
+        }
+
+        function triggerSuccess() {
+            if (successLocked) return;
+            successLocked = true;
+            successOverlay.style.display = 'flex';
+            resultMax.textContent = maxDb;
+            stopMeasurement();
+        }
+
+        function updateCalibrationDisplay() {
+            calibrationValue.textContent = calibrationOffset;
+        }
+
+        function loadCalibration() {
+            const saved = localStorage.getItem(CAL_STORAGE_KEY);
+            if (saved) {
+                const parsed = Number(saved);
+                if (!Number.isNaN(parsed)) {
+                    calibrationOffset = Math.min(140, Math.max(90, parsed));
+                    calibrationRange.value = calibrationOffset;
+                }
+            }
+            updateCalibrationDisplay();
+        }
+
+        function stopMeasurement() {
+            if (javascriptNode) {
+                try { javascriptNode.disconnect(); } catch (_) {}
+            }
+            if (analyser) {
+                try { analyser.disconnect(); } catch (_) {}
+            }
+            if (microphone) {
+                try { microphone.disconnect(); } catch (_) {}
+                if (microphone.mediaStream) {
+                    microphone.mediaStream.getTracks().forEach(t => t.stop());
+                }
+            }
+            if (audioContext) {
+                audioContext.close().catch(() => {});
+            }
+            measuring = false;
+            startBtn.disabled = false;
+            startBtn.textContent = 'もう一度計測';
+            startBtn.style.backgroundColor = 'var(--mega-yellow)';
+            startBtn.style.color = 'var(--mega-black)';
+            audioContext = null;
+            analyser = null;
+            microphone = null;
+            javascriptNode = null;
+        }
+
+        function handleCloseOverlay() {
+            successOverlay.style.display = 'none';
+        }
+
+        calibrationRange.addEventListener('input', (e) => {
+            calibrationOffset = Number(e.target.value);
+            updateCalibrationDisplay();
+            localStorage.setItem(CAL_STORAGE_KEY, calibrationOffset);
+        });
+
+        async function startMeasurement() {
+            if (measuring) return;
+            measuring = true;
+            maxDb = 0;
+            dbValue.textContent = '0';
+            maxValue.textContent = '0';
+            successLocked = false;
+            successOverlay.style.display = 'none';
+
+            try {
+                const stream = await navigator.mediaDevices.getUserMedia({
+                    audio: {
+                        echoCancellation: false,
+                        noiseSuppression: false,
+                        autoGainControl: false,
+                        channelCount: 1
+                    }
+                });
+                audioContext = new (window.AudioContext || window.webkitAudioContext)();
+                analyser = audioContext.createAnalyser();
+                analyser.fftSize = 2048;
+
+                microphone = audioContext.createMediaStreamSource(stream);
+                javascriptNode = audioContext.createScriptProcessor(2048, 1, 1);
+
+                analyser.smoothingTimeConstant = 0.2;
+                microphone.connect(analyser);
+                analyser.connect(javascriptNode);
+                javascriptNode.connect(audioContext.destination);
+
+                const floatData = new Float32Array(analyser.fftSize);
+                let smoothedDb = 0;
+
+                javascriptNode.onaudioprocess = function() {
+                    analyser.getFloatTimeDomainData(floatData);
+                    const instantDb = getDbFromFloatArray(floatData);
+                    // 近似的に応答をなめらかに
+                    smoothedDb = smoothedDb * 0.65 + instantDb * 0.35;
+                    updateVisual(Math.round(smoothedDb));
+                };
+
+                startBtn.textContent = '計測中…叫べ！';
+                startBtn.disabled = true;
+                startBtn.style.backgroundColor = '#ccc';
+                startBtn.style.color = '#666';
+            } catch (err) {
+                alert('マイクアクセスを許可してね！ / ' + err.message);
+                measuring = false;
+            }
+        }
+
+        startBtn.addEventListener('click', startMeasurement);
+        closeOverlayBtn.addEventListener('click', handleCloseOverlay);
+        loadCalibration();
+    </script>
+</body>
+</html>
