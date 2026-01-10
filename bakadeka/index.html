@@ -473,16 +473,16 @@
             return spl;
         }
 
-        function updateVisual(db) {
-            dbValue.textContent = db;
-            if (db > maxDb) {
-                maxDb = db;
+        function updateVisual(displayDb, peakDb) {
+            dbValue.textContent = displayDb;
+            if (peakDb > maxDb) {
+                maxDb = peakDb;
                 maxValue.textContent = maxDb;
                 if (maxDb >= 100) {
                     triggerSuccess();
                 }
             }
-            const height = Math.min(100, db) + '%';
+            const height = Math.min(100, displayDb) + '%';
             volumeBar.style.height = height;
         }
 
@@ -584,8 +584,10 @@
                     analyser.getFloatTimeDomainData(floatData);
                     const instantDb = getDbFromFloatArray(floatData);
                     // 近似的に応答をなめらかに
-                    smoothedDb = smoothedDb * 0.65 + instantDb * 0.35;
-                    updateVisual(Math.round(smoothedDb));
+                    smoothedDb = smoothedDb * 0.6 + instantDb * 0.4;
+                    const displayDb = Math.round(smoothedDb);
+                    const peakDb = Math.max(displayDb, Math.round(instantDb)); // 余韻のピークも拾う
+                    updateVisual(displayDb, peakDb);
                 };
 
                 startBtn.textContent = '計測中…叫べ！';
