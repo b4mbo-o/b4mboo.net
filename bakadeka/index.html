@@ -451,6 +451,8 @@
         const calibrationValue = document.getElementById('calibrationValue');
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
         const CAL_STORAGE_KEY = 'bakuon_cal_offset';
+        const LOUD_THRESHOLD = 80; // dB境界
+        const QUIET_FRAMES_TO_STOP = 8; // しきい値を下回ったら何フレームで終了判定か
 
         let audioContext;
         let analyser;
@@ -460,6 +462,8 @@
         let measuring = false;
         let calibrationOffset = Number(calibrationRange.value); // dBFS -> dB SPL 仮変換
         let successLocked = false;
+        let loudActive = false;
+        let quietCount = 0;
 
         function getDbFromFloatArray(floatArray) {
             let sumSquares = 0;
@@ -473,14 +477,11 @@
             return spl;
         }
 
-        function updateVisual(displayDb, peakDb) {
+        function updateVisual(displayDb, peakDb, shouldUpdateMax) {
             dbValue.textContent = displayDb;
-            if (peakDb > maxDb) {
+            if (shouldUpdateMax && peakDb > maxDb) {
                 maxDb = peakDb;
                 maxValue.textContent = maxDb;
-                if (maxDb >= 100) {
-                    triggerSuccess();
-                }
             }
             const height = Math.min(100, displayDb) + '%';
             volumeBar.style.height = height;
@@ -555,6 +556,8 @@
             maxValue.textContent = '0';
             successLocked = false;
             successOverlay.style.display = 'none';
+            loudActive = false;
+            quietCount = 0;
 
             try {
                 const stream = await navigator.mediaDevices.getUserMedia({
@@ -587,7 +590,18 @@
                     smoothedDb = smoothedDb * 0.6 + instantDb * 0.4;
                     const displayDb = Math.round(smoothedDb);
                     const peakDb = Math.max(displayDb, Math.round(instantDb)); // 余韻のピークも拾う
-                    updateVisual(displayDb, peakDb);
+                    const isLoud = peakDb >= LOUD_THRESHOLD;
+                    if (isLoud) {
+                        loudActive = true;
+                        quietCount = 0;
+                    } else if (loudActive) {
+                        quietCount++;
+                        if (quietCount >= QUIET_FRAMES_TO_STOP) {
+                            triggerSuccess();
+                            return;
+                        }
+                    }
+                    updateVisual(displayDb, peakDb, isLoud);
                 };
 
                 startBtn.textContent = '計測中…叫べ！';
