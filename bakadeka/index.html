@@ -249,6 +249,7 @@
             color: var(--mega-white);
         }
 
+
         .note {
             font-size: 0.8rem;
             color: var(--mega-white);
@@ -382,6 +383,18 @@
             opacity: 0.85;
         }
 
+        .demo-link {
+            margin-top: 6px;
+            font-size: 0.85rem;
+            color: #ccc;
+            background: none;
+            border: none;
+            text-decoration: underline;
+            cursor: pointer;
+            opacity: 0.8;
+            display: none;
+        }
+
         /* アニメーション */
         @keyframes flash {
             0% { background: rgba(255,0,255,0.9); }
@@ -444,6 +457,7 @@
         </div>
 
         <button id="startBtn">計測スタート！</button>
+        <button id="demoBtn" class="demo-link" type="button">マイクなしデモ再生</button>
 
         <div class="calibration">
             <div class="calibration-title">🎚 校正（dBオフセット）</div>
@@ -474,9 +488,9 @@
         <div class="boom-icon">📣📣📣</div>
         <div class="success-text">バカ大声〜‼️</div>
         <div class="result-score">記録: <span id="resultMax">0</span> dB</div>
-        <div class="success-lead">大声チケットで会場へ！</div>
+        <div class="success-lead">大声チケットは売り切れでも声出せるのか～‼️</div>
         <div class="cta-buttons">
-            <a class="cta-button" id="ticketLink" href="https://ticketdive.com/event/bakuonsai_0323" target="_blank" rel="noopener">🎫 大声チケット購入はこちら！</a>
+            <a class="cta-button" id="ticketLink" href="https://ticketdive.com/event/bakuonsai_0323" target="_blank" rel="noopener">🎫 大声チケット（完売公演😭）</a>
             <a class="ghost-button" id="shareBtn" href="#" target="_blank" rel="noopener">𝕏 でシェア</a>
             <button class="ghost-button" id="closeOverlayBtn">✖ 閉じる / 続けて計測</button>
         </div>
@@ -494,10 +508,12 @@
         const calibrationValue = document.getElementById('calibrationValue');
         const closeOverlayBtn = document.getElementById('closeOverlayBtn');
         const shareBtn = document.getElementById('shareBtn');
+        const demoBtn = document.getElementById('demoBtn');
         const CAL_STORAGE_KEY = 'bakuon_cal_offset';
         const SUCCESS_THRESHOLD = 100; // 成功判定を始める閾値
         const HOLD_THRESHOLD = 90; // 成功後、ここを下回ったら終了カウント
         const QUIET_FRAMES_TO_STOP = 8; // しきい値を下回ったら何フレームで終了判定か
+        const demoAllowed = window.location.href.includes('dev.b4mboo.net/proxy/5500/');
 
         let audioContext;
         let analyser;
@@ -509,6 +525,7 @@
         let successLocked = false;
         let quietCount = 0;
         let hasHitSuccessThreshold = false;
+        let demoInterval = null;
         let latestShareUrl = '';
 
         function getDbFromFloatArray(floatArray) {
@@ -527,6 +544,29 @@
             dbValue.textContent = displayDb;
             const height = Math.min(100, displayDb) + '%';
             volumeBar.style.height = height;
+        }
+
+        function processDbSample(peakDb, displayDb = peakDb) {
+            if (peakDb > maxDb) {
+                maxDb = peakDb;
+                maxValue.textContent = maxDb;
+            }
+            if (peakDb >= SUCCESS_THRESHOLD) {
+                hasHitSuccessThreshold = true;
+                quietCount = 0;
+            }
+            if (hasHitSuccessThreshold) {
+                if (peakDb < HOLD_THRESHOLD) {
+                    quietCount++;
+                    if (quietCount >= QUIET_FRAMES_TO_STOP) {
+                        triggerSuccess();
+                        return;
+                    }
+                } else {
+                    quietCount = 0;
+                }
+            }
+            updateVisual(displayDb);
         }
 
         function triggerSuccess() {
@@ -587,10 +627,15 @@
             startBtn.textContent = 'もう一度計測';
             startBtn.style.backgroundColor = 'var(--mega-yellow)';
             startBtn.style.color = 'var(--mega-black)';
+            demoBtn.disabled = false;
             audioContext = null;
             analyser = null;
             microphone = null;
             javascriptNode = null;
+            if (demoInterval) {
+                clearInterval(demoInterval);
+                demoInterval = null;
+            }
         }
 
         function handleCloseOverlay() {
@@ -609,6 +654,39 @@
             updateCalibrationDisplay();
             localStorage.setItem(CAL_STORAGE_KEY, calibrationOffset);
         });
+
+        function startDemo() {
+            if (!demoAllowed) return;
+            if (measuring) return;
+            measuring = true;
+            maxDb = 0;
+            dbValue.textContent = '0';
+            maxValue.textContent = '0';
+            successLocked = false;
+            successOverlay.style.display = 'none';
+            hasHitSuccessThreshold = false;
+            quietCount = 0;
+            startBtn.disabled = true;
+            demoBtn.disabled = true;
+            startBtn.textContent = 'デモ再生中';
+            startBtn.style.backgroundColor = '#ccc';
+            startBtn.style.color = '#666';
+
+            const demoPattern = [60, 65, 70, 75, 82, 90, 98, 104, 112, 120, 114, 108, 101, 96, 90, 84, 78, 72];
+            let idx = 0;
+            demoInterval = setInterval(() => {
+                if (!measuring) return;
+                const base = demoPattern[idx % demoPattern.length];
+                const jitter = Math.random() * 4 - 2;
+                const sample = Math.max(0, Math.round(base + jitter));
+                processDbSample(sample, sample);
+                idx++;
+                if (idx > demoPattern.length + 20 && !hasHitSuccessThreshold) {
+                    // 強制的に超えるパルス
+                    processDbSample(118, 118);
+                }
+            }, 90);
+        }
 
         async function startMeasurement() {
             if (measuring) return;
@@ -652,44 +730,32 @@
                     smoothedDb = smoothedDb * 0.6 + instantDb * 0.4;
                     const displayDb = Math.round(smoothedDb);
                     const peakDb = Math.max(displayDb, Math.round(instantDb)); // 余韻のピークも拾う
-                    if (peakDb > maxDb) {
-                        maxDb = peakDb;
-                        maxValue.textContent = maxDb;
-                    }
-
-                    if (peakDb >= SUCCESS_THRESHOLD) {
-                        hasHitSuccessThreshold = true;
-                        quietCount = 0;
-                    }
-
-                    if (hasHitSuccessThreshold) {
-                        if (peakDb < HOLD_THRESHOLD) {
-                            quietCount++;
-                            if (quietCount >= QUIET_FRAMES_TO_STOP) {
-                                triggerSuccess();
-                                return;
-                            }
-                        } else {
-                            quietCount = 0;
-                        }
-                    }
-
-                    updateVisual(displayDb);
+                    processDbSample(peakDb, displayDb);
                 };
 
                 startBtn.textContent = '計測中…叫べ！';
                 startBtn.disabled = true;
                 startBtn.style.backgroundColor = '#ccc';
                 startBtn.style.color = '#666';
+                demoBtn.disabled = true;
             } catch (err) {
                 alert('マイクアクセスを許可してね！ / ' + err.message);
                 measuring = false;
+                startBtn.disabled = false;
+                demoBtn.disabled = false;
+                startBtn.textContent = '計測スタート！';
+                startBtn.style.backgroundColor = 'var(--mega-yellow)';
+                startBtn.style.color = 'var(--mega-black)';
             }
         }
 
         startBtn.addEventListener('click', startMeasurement);
         closeOverlayBtn.addEventListener('click', handleCloseOverlay);
         shareBtn.addEventListener('click', handleShareClick);
+        if (demoAllowed) {
+            demoBtn.style.display = 'inline-block';
+            demoBtn.addEventListener('click', startDemo);
+        }
         loadCalibration();
     </script>
 </body>
