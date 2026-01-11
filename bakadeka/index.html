@@ -513,7 +513,7 @@
         const SUCCESS_THRESHOLD = 100; // 成功判定を始める閾値
         const HOLD_THRESHOLD = 90; // 成功後、ここを下回ったら終了カウント
         const QUIET_FRAMES_TO_STOP = 8; // しきい値を下回ったら何フレームで終了判定か
-        const demoAllowed = window.location.href.includes('dev.b4mboo.net/proxy/5500/');
+        const demoAllowed = window.location.pathname.includes('/proxy/5500/');
 
         let audioContext;
         let analyser;
