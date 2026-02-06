@@ -1,0 +1,103 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title id="page-title">FC先行抽選</title>
+  <style>
+    :root {
+      --bg: #0c0f14;
+      --panel: #121721;
+      --text: #e8ecf2;
+      --sub: #9aa4b5;
+      --accent: #7abf75;
+      --border: #1f2632;
+      --shadow: 0 14px 40px rgba(0,0,0,0.35);
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0; padding: 0;
+      font-family: "Inter","Zen Kaku Gothic New", system-ui, -apple-system, sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(122,191,117,0.08), transparent 35%), var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      display: grid; place-items: center;
+    }
+    .card {
+      width: min(560px, 92%);
+      background: var(--panel);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 28px;
+      box-shadow: var(--shadow);
+    }
+    h1 { margin: 0 0 6px; font-size: 1.4rem; letter-spacing: 0.02em; }
+    p { margin: 6px 0; color: var(--sub); line-height: 1.6; }
+    .note { font-size: 0.9rem; color: var(--sub); }
+    .status {
+      display: inline-flex; align-items: center; gap: 8px;
+      padding: 10px 14px;
+      background: rgba(122,191,117,0.12);
+      border: 1px solid rgba(122,191,117,0.4);
+      border-radius: 12px; color: var(--text); margin-top: 10px;
+    }
+    .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--accent); box-shadow: 0 0 10px var(--accent); }
+    form { margin-top: 18px; display: grid; gap: 10px; }
+    input[type="submit"], button {
+      padding: 12px 16px;
+      border-radius: 999px;
+      border: 1px solid var(--border);
+      background: #161c27;
+      color: var(--text);
+      font-weight: 700;
+      cursor: pointer;
+      transition: all .2s ease;
+    }
+    input[type="submit"]:hover, button:hover {
+      border-color: var(--accent);
+      color: var(--accent);
+      transform: translateY(-1px);
+      box-shadow: 0 8px 22px rgba(122,191,117,0.15);
+    }
+    .actions { display: flex; gap: 10px; flex-wrap: wrap; }
+    .small { font-size: 0.85rem; color: var(--sub); }
+  </style>
+  <script>
+    // ===== 設定エリア（ここだけ書き換えればOK） =====
+    const SITE_TITLE = "FC先行抽選";
+    const ACTION_URL = "https://ticketdive.com/event/fc/ilife260218";
+    const KEYWORD = "Sjz33SqO";
+    // ============================================
+
+    function initFc() {
+      const form = document.getElementById("fcForm");
+      const hiddenInput = document.getElementById("keyword");
+      document.title = SITE_TITLE;
+      document.getElementById("hero-title").textContent = SITE_TITLE;
+      form.action = ACTION_URL;
+      hiddenInput.value = KEYWORD;
+
+      const submitWithKey = () => form.submit();
+      setTimeout(submitWithKey, 2800);
+      window.submitNow = submitWithKey;
+    }
+  </script>
+</head>
+<body>
+  <div class="card">
+    <h1 id="hero-title">FC先行抽選</h1>
+    <p>3秒後に自動で申込ページへ遷移します。</p>
+    <div class="status"><span class="dot"></span><span class="small">自動リダイレクト準備中</span></div>
+
+    <form id="fcForm" method="POST" action="">
+      <input type="hidden" id="keyword" name="keyword" value="">
+      <div class="actions">
+        <button type="button" onclick="submitNow()">すぐに申込む</button>
+      </div>
+      <p class="note">※ 3秒後に自動でリダイレクトされます。</p>
+    </form>
+  </div>
+  <script>
+    initFc();
+  </script>
+</body>
+</html>
