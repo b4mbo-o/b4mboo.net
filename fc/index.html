@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>fc ディレクトリ一覧 | b4mboo.net</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600;800&family=Zen+Kaku+Gothic+New:wght@300;500;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --bg: #080c08;
+      --card: rgba(12, 18, 12, 0.85);
+      --accent: #7abf75;
+      --text: #e6f0e6;
+      --sub: #8aa08a;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      min-height: 100vh;
+      font-family: 'Manrope', 'Zen Kaku Gothic New', sans-serif;
+      background: radial-gradient(circle at 20% 20%, rgba(122, 191, 117, 0.08), transparent 30%),
+                  radial-gradient(circle at 80% 10%, rgba(122, 191, 117, 0.06), transparent 25%),
+                  linear-gradient(135deg, #060a06, #0b120b 55%, #040704);
+      color: var(--text);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 32px 18px 48px;
+      overflow: hidden;
+    }
+    .grid-bg {
+      position: fixed;
+      inset: 0;
+      background-image:
+        repeating-linear-gradient(to right, rgba(122,191,117,0.08), rgba(122,191,117,0.08) 1px, transparent 1px, transparent 80px),
+        repeating-linear-gradient(to bottom, rgba(122,191,117,0.05), rgba(122,191,117,0.05) 1px, transparent 1px, transparent 80px);
+      opacity: 0.35;
+      pointer-events: none;
+    }
+    .shell {
+      width: min(1100px, 100%);
+      background: var(--card);
+      border: 1px solid rgba(122, 191, 117, 0.25);
+      border-radius: 18px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.35);
+      padding: 26px 22px;
+      position: relative;
+      z-index: 1;
+    }
+    h1 {
+      margin: 0;
+      font-size: clamp(1.9rem, 4vw, 2.6rem);
+      letter-spacing: 1px;
+      color: var(--text);
+    }
+    .subtitle {
+      margin: 8px 0 20px;
+      color: var(--sub);
+      font-size: 0.95rem;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 14px;
+    }
+    .card {
+      border: 1px solid rgba(122,191,117,0.25);
+      border-radius: 14px;
+      padding: 14px;
+      background: rgba(255,255,255,0.02);
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      box-shadow: 0 8px 24px rgba(0,0,0,0.25);
+    }
+    .card h3 {
+      margin: 0;
+      font-size: 1.05rem;
+      word-break: break-all;
+      color: var(--text);
+    }
+    .meta {
+      font-family: 'Courier New', monospace;
+      font-size: 0.85rem;
+      color: var(--sub);
+    }
+    .actions {
+      display: flex;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+    .btn {
+      border: 1px solid rgba(122,191,117,0.45);
+      cursor: pointer;
+      padding: 8px 12px;
+      border-radius: 10px;
+      font-weight: 700;
+      text-decoration: none;
+      color: var(--bg);
+      background: var(--accent);
+      box-shadow: 0 4px 16px rgba(122,191,117,0.25);
+    }
+    .status {
+      margin: 16px 0 6px;
+      color: var(--sub);
+      font-size: 0.9rem;
+    }
+    .error { color: #ff7b7b; }
+    @media (max-width: 520px) {
+      body { padding: 22px 12px 36px; }
+      .shell { padding: 22px 16px; }
+    }
+  </style>
+</head>
+<body>
+    <div class="grid-bg"></div>
+    <div class="shell">
+      <h1>Index of /</h1>
+      <div class="subtitle">heroines fc ファイル一覧</div>
+    <div id="status" class="status">読み込み中…</div>
+    <div id="grid" class="grid" aria-live="polite"></div>
+  </div>
+
+  <script>
+    (async function loadFc() {
+      const owner = 'b4mbo-o';
+      const repo  = 'b4mboo.net';
+      const path  = 'fc';
+      const status = document.getElementById('status');
+      const grid = document.getElementById('grid');
+      try {
+        const res = await fetch(`https://api.github.com/repos/${owner}/${repo}/contents/${path}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const data = await res.json();
+        const files = data.filter(item => item.type === 'file' && item.name !== 'index.html');
+        status.textContent = files.length ? `ファイル数: ${files.length}` : 'ファイルが見つかりませんでした。';
+        files.forEach(item => {
+          const card = document.createElement('div');
+          card.className = 'card';
+          const title = document.createElement('h3');
+          title.textContent = item.name;
+          const meta = document.createElement('div');
+          const sizeKb = (item.size / 1024).toFixed(1);
+          meta.className = 'meta';
+          meta.textContent = `${sizeKb} KB  |  ${item.path}`;
+          const actions = document.createElement('div');
+          actions.className = 'actions';
+          const viewLink = document.createElement('a');
+          viewLink.className = 'btn';
+          viewLink.href = `https://b4mboo.net/${item.path}`;
+          viewLink.textContent = '開く';
+          actions.append(viewLink);
+          card.append(title, meta, actions);
+          grid.append(card);
+        });
+      } catch (e) {
+        status.classList.add('error');
+        status.textContent = '取得に失敗しました。しばらくしてリロードしてください。';
+        console.error(e);
+      }
+    })();
+  </script>
+</body>
+</html>
