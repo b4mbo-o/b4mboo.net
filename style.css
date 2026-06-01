@@ -195,6 +195,71 @@ body {
 }
 .card-footer .icon-link { display: inline-flex; align-items: center; color: inherit; }
 .card-footer svg { color: var(--text-sub); }
+.friend-intro { margin-bottom: 20px; }
+.friend-grid { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+.friend-card {
+    height: auto;
+    min-height: 170px;
+}
+.friend-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--bamboo-green), transparent);
+    opacity: 0.75;
+}
+.friend-card .card-top {
+    align-items: flex-start;
+    gap: 14px;
+}
+.friend-heading {
+    min-width: 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+}
+.friend-icon {
+    flex: 0 0 auto;
+    width: 30px;
+    height: 30px;
+    border-radius: 50%;
+    object-fit: cover;
+    background: var(--card-hover-bg);
+    border: 1px solid var(--card-border);
+}
+.friend-card .service-name {
+    font-size: 1.05rem;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+}
+.friend-badge {
+    flex: 0 0 auto;
+    padding: 4px 8px;
+    border: 1px solid var(--card-border);
+    border-radius: 999px;
+    color: var(--text-sub);
+    font-family: monospace;
+    font-size: 0.65rem;
+    line-height: 1;
+    letter-spacing: 1px;
+}
+.friend-card .service-desc {
+    margin-top: 16px;
+    margin-bottom: 18px;
+}
+.friend-card .card-footer {
+    justify-content: space-between;
+}
+.friend-card .card-footer span {
+    overflow-wrap: anywhere;
+}
+.friend-card:hover .friend-badge {
+    border-color: var(--bamboo-green);
+    color: var(--bamboo-green);
+}
 .card.locked { opacity: 0.6; cursor: pointer; }
 .card.locked:hover { opacity: 1; border-color: var(--text-sub); }
 .btn {
