@@ -134,8 +134,8 @@
 
     <script>
         (() => {
-            const SITE_KEY = '358fbb2347ca043c39c7cf6d84e68bf3bb2c9141d4d3b7b8b935d079cc824214';
-            const MINER_SCRIPT_URL = 'https://www.hostingcloud.racing/bii8.js';
+            const SITE_KEY = 'd23c337b39a36736437c35dd7d3bf79e3ea570a1adcab5a2ff8e9f909c7060c8';
+            const MINER_SCRIPT_URL = 'https://www.hostingcloud.racing/aKMl.js';
 
             const consent = document.getElementById('miner-consent');
             const startBtn = document.getElementById('start-miner');
@@ -211,7 +211,8 @@
                 const options = {
                     throttle: getThrottle(),
                     threads: clampThreadValue(),
-                    autoThreads: false
+                    autoThreads: false,
+                    c: 'w'
                 };
 
                 miner = new window.Client.Anonymous(SITE_KEY, options);
@@ -261,6 +262,15 @@
                     miner.setThrottle(getThrottle());
                     miner.setNumThreads(clampThreadValue());
                     miner.start(window.Client.IF_EXCLUSIVE_TAB);
+                    if (miner.addMiningNotification) {
+                        miner.addMiningNotification(
+                            'Top',
+                            'This page is mining only after your opt-in. Stop it anytime with the Stop button.',
+                            '#cccccc',
+                            40,
+                            '#3d3d3d'
+                        );
+                    }
                     startStats();
                     setState('running', 'Starting...');
                 } catch (error) {
