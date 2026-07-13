@@ -53,6 +53,7 @@
                         <li>勝手に開始しません。Startを押すまでCoinIMPのスクリプトも読み込みません。</li>
                         <li>このページを閉じる、移動する、タブを非表示にすると停止します。</li>
                         <li>CPU使用率は低めに制限できます。熱い、重い、ファンが回る時はStopしてください。</li>
+                        <li>Full power modeは端末がかなり重くなる可能性があります。短時間だけ使ってください。</li>
                         <li>ブラウザや拡張機能によってはマイニングスクリプトがブロックされます。</li>
                     </ul>
                 </div>
@@ -74,12 +75,20 @@
                         <span>CPUリソースを使用してマイニングすること、電力消費や発熱が増える可能性があることを理解して許可します。</span>
                     </label>
 
+                    <label class="donate-power-mode">
+                        <input type="checkbox" id="full-power-mode">
+                        <span>
+                            <strong>Full power mode</strong>
+                            <small>CPU上限を100%相当にして、使える最大スレッドで回します。</small>
+                        </span>
+                    </label>
+
                     <div class="donate-setting">
                         <div class="donate-setting-head">
                             <label for="cpu-limit">CPU limit</label>
                             <span id="cpu-limit-value">20%</span>
                         </div>
-                        <input type="range" id="cpu-limit" min="10" max="50" step="5" value="20">
+                        <input type="range" id="cpu-limit" min="10" max="100" step="5" value="20">
                     </div>
 
                     <div class="donate-setting">
@@ -140,6 +149,7 @@
             const consent = document.getElementById('miner-consent');
             const startBtn = document.getElementById('start-miner');
             const stopBtn = document.getElementById('stop-miner');
+            const fullPowerMode = document.getElementById('full-power-mode');
             const cpuLimit = document.getElementById('cpu-limit');
             const cpuLimitValue = document.getElementById('cpu-limit-value');
             const threadCount = document.getElementById('thread-count');
@@ -156,7 +166,7 @@
             let statsTimer = null;
             let isBusy = false;
 
-            const hardwareThreads = Math.max(1, Math.min(4, navigator.hardwareConcurrency || 1));
+            const hardwareThreads = Math.max(1, Math.min(16, navigator.hardwareConcurrency || 1));
             threadCount.max = String(hardwareThreads);
             threadCount.value = '1';
 
@@ -170,7 +180,7 @@
 
             function getThrottle() {
                 const cpuPercent = Number.parseInt(cpuLimit.value, 10) || 20;
-                return Math.max(0.5, Math.min(0.9, 1 - (cpuPercent / 100)));
+                return Math.max(0, Math.min(0.9, 1 - (cpuPercent / 100)));
             }
 
             function setState(nextState, message) {
@@ -189,6 +199,31 @@
             function updateSettingsLabels() {
                 cpuLimitValue.textContent = `${cpuLimit.value}%`;
                 clampThreadValue();
+            }
+
+            function syncFullPowerMode() {
+                if (fullPowerMode.checked) {
+                    cpuLimit.value = '100';
+                    threadCount.value = String(hardwareThreads);
+                    cpuLimit.disabled = true;
+                    threadCount.disabled = true;
+                    setState(
+                        miner && miner.isRunning && miner.isRunning() ? 'running' : 'idle',
+                        miner && miner.isRunning && miner.isRunning() ? 'Full power mode is running' : 'Full power mode ready'
+                    );
+                } else {
+                    cpuLimit.disabled = false;
+                    threadCount.disabled = false;
+                    if (!(miner && miner.isRunning && miner.isRunning())) {
+                        setState('idle', 'Stopped');
+                    }
+                }
+
+                updateSettingsLabels();
+                if (miner) {
+                    miner.setThrottle(getThrottle());
+                    miner.setNumThreads(clampThreadValue());
+                }
             }
 
             function loadMinerScript() {
@@ -290,6 +325,7 @@
             }
 
             consent.addEventListener('change', updateButtons);
+            fullPowerMode.addEventListener('change', syncFullPowerMode);
             cpuLimit.addEventListener('input', () => {
                 updateSettingsLabels();
                 if (miner) miner.setThrottle(getThrottle());

@@ -390,6 +390,40 @@ button { padding: 8px 24px; border-radius: 4px; font-size: 0.8rem; font-weight: 
     accent-color: var(--bamboo-green);
     margin-top: 2px;
 }
+.donate-power-mode {
+    margin-top: 16px;
+    padding: 12px;
+    display: grid;
+    grid-template-columns: 18px 1fr;
+    gap: 10px;
+    align-items: start;
+    border: 1px solid rgba(214, 179, 95, 0.35);
+    border-radius: 8px;
+    background: rgba(214, 179, 95, 0.08);
+    color: var(--text-main);
+    cursor: pointer;
+}
+.donate-power-mode input {
+    width: 18px;
+    height: 18px;
+    accent-color: #d6b35f;
+    margin-top: 3px;
+}
+.donate-power-mode strong,
+.donate-power-mode small {
+    display: block;
+    overflow-wrap: anywhere;
+}
+.donate-power-mode strong {
+    font-size: 0.9rem;
+    line-height: 1.3;
+}
+.donate-power-mode small {
+    margin-top: 3px;
+    color: var(--text-sub);
+    font-size: 0.78rem;
+    line-height: 1.5;
+}
 .donate-setting { margin-top: 18px; }
 .donate-setting-head {
     display: flex;
@@ -414,6 +448,10 @@ button { padding: 8px 24px; border-radius: 4px; font-size: 0.8rem; font-weight: 
     background: var(--input-bg);
     color: var(--text-main);
     font: inherit;
+}
+.donate-setting input:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
 }
 .donate-actions {
     margin-top: 22px;
