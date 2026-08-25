@@ -1,5 +1,5 @@
 document.addEventListener('DOMContentLoaded', () => {
-    
+
     /* --- 1. テーマ切り替え --- */
     const themeBtn = document.getElementById('theme-toggle');
     const setTheme = (nextTheme) => {
@@ -20,89 +20,18 @@ document.addEventListener('DOMContentLoaded', () => {
         });
     }
 
-    // カスタムカーソルは削除しました
-
-    /* --- 2. 3Dカードチルト --- */
-    applyCardTilt();
-
-    /* --- 5. Blog Feed Fetcher (New!) --- */
+    /* --- 2. Blog Feed Fetcher --- */
     fetchNotes();
+
+    /* --- 3. スクロール演出 --- */
+    setupScrollSpy();
+    setupCardReveal();
+    setupTabTitle();
+    printConsoleArt();
 });
 
 
-/* --- 4. Bamboo Gate (パスワード機能) --- */
-const secretMap = {
-    'esim': 'https://esim.b4mboo.net',
-    'povo': 'https://povo.b4mboo.net',
-    'dev':  'https://dev.b4mboo.net'
-};
-
-const GATE_PASS = "bamboo"; 
-
-let currentTarget = null;
-const modal = document.getElementById('gate-modal');
-const passInput = document.getElementById('gate-pass');
-
-function openGate(targetKey) {
-    currentTarget = targetKey;
-    modal.classList.add('active');
-    passInput.value = '';
-    setTimeout(() => passInput.focus(), 100);
-}
-
-function closeGate() {
-    modal.classList.remove('active');
-    currentTarget = null;
-}
-
-function checkGate() {
-    if (passInput.value === GATE_PASS) {
-        const url = secretMap[currentTarget];
-        if (url) {
-            window.open(url, '_blank');
-            closeGate();
-        }
-    } else {
-        passInput.style.borderColor = '#ff6b6b';
-        passInput.animate([
-            { transform: 'translateX(0)' }, { transform: 'translateX(-8px)' },
-            { transform: 'translateX(8px)' }, { transform: 'translateX(0)' }
-        ], { duration: 200 });
-        setTimeout(() => passInput.style.borderColor = 'var(--card-border)', 800);
-    }
-}
-
-passInput.addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') checkGate();
-});
-
-
-/* --- Utility: カードのチルト効果を付与 --- */
-function applyCardTilt() {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
-
-    document.querySelectorAll('.link-card').forEach(card => {
-        if (card.dataset.tiltBound === '1') return;
-        card.dataset.tiltBound = '1';
-
-        card.addEventListener('mousemove', (e) => {
-            const rect = card.getBoundingClientRect();
-            const x = e.clientX - rect.left;
-            const y = e.clientY - rect.top;
-            const centerX = rect.width / 2;
-            const centerY = rect.height / 2;
-            const rotateX = ((y - centerY) / centerY) * -4;
-            const rotateY = ((x - centerX) / centerX) * 4;
-            card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale(1.02)`;
-        });
-
-        card.addEventListener('mouseleave', () => {
-            card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0) scale(1)';
-        });
-    });
-}
-
-/* --- 5. Notes (Blog) Fetcher Logic --- */
+/* --- Notes (Blog) Fetcher Logic --- */
 async function fetchNotes() {
     const container = document.getElementById('notes-container');
     if (!container) return;
@@ -110,7 +39,7 @@ async function fetchNotes() {
     // ★設定: ブログのRSSフィードURL
     // notes.b4mboo.net で生成したフィードを参照します
     // Astroのビルドで生成されるRSSは feed.xml なので明示的に参照する
-    const BLOG_RSS_URL = 'https://notes.b4mboo.net/feed.xml'; 
+    const BLOG_RSS_URL = 'https://notes.b4mboo.net/feed.xml';
 
     try {
         const response = await fetch(BLOG_RSS_URL, { headers: { 'Accept': 'application/xml' } });
@@ -144,8 +73,6 @@ async function fetchNotes() {
             container.innerHTML += cardHTML;
         });
 
-        // 新しく挿入したカードにもエフェクトを付与
-        applyCardTilt();
     } catch (error) {
         console.log("Blog fetch failed (maybe blog is not ready yet):", error);
         // エラー時は「Coming Soon」のままにしておくか、メッセージを変える
@@ -155,4 +82,66 @@ async function fetchNotes() {
             </div>
         `;
     }
+}
+
+/* ============================================================
+   ✨ スクロール演出 & 小ネタ (ターミナル関連は terminal.js 側)
+   ============================================================ */
+
+/* --- Scrollspy: 現在地をナビに反映 --- */
+function setupScrollSpy() {
+    const links = new Map();
+    document.querySelectorAll('.nav-link[href^="#"]').forEach(a => {
+        links.set(a.getAttribute('href').slice(1), a);
+    });
+    if (links.size === 0 || !('IntersectionObserver' in window)) return;
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            links.forEach(a => a.classList.remove('active'));
+            const link = links.get(entry.target.id);
+            if (link) link.classList.add('active');
+        });
+    }, { rootMargin: '-30% 0px -60% 0px' });
+
+    document.querySelectorAll('.content-section[id]').forEach(sec => io.observe(sec));
+}
+
+/* --- カードのスクロール出現 (段差付き) --- */
+function setupCardReveal() {
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+    if (!('IntersectionObserver' in window)) return;
+    const cards = document.querySelectorAll('.grid-wrapper .card');
+    cards.forEach(c => c.classList.add('reveal-pending'));
+
+    const io = new IntersectionObserver((entries) => {
+        entries.forEach(entry => {
+            if (!entry.isIntersecting) return;
+            const card = entry.target;
+            const siblings = Array.from(card.parentElement.children);
+            const idx = siblings.indexOf(card);
+            card.style.animationDelay = `${Math.min(idx, 6) * 70}ms`;
+            card.classList.remove('reveal-pending');
+            card.classList.add('reveal-in');
+            io.unobserve(card);
+        });
+    }, { threshold: 0.15 });
+
+    cards.forEach(c => io.observe(c));
+}
+
+/* --- タブを離れたら寝る --- */
+function setupTabTitle() {
+    const original = document.title;
+    document.addEventListener('visibilitychange', () => {
+        document.title = document.hidden ? '( ˘ω˘ ) ｽﾔｧ… | b4mboo.net' : original;
+    });
+}
+
+/* --- Console Art --- */
+function printConsoleArt() {
+    console.log('%c🎋 b4mboo.net', 'color:#7abf75; font-size:24px; font-weight:bold; text-shadow:0 0 10px rgba(122,191,117,.5);');
+    console.log('%cようこそ、DevToolsを開くタイプのきっしょいおたくくん', 'color:#888; font-size:12px;');
+    console.log('%c裏コマンド: 「/」キーでターミナル起動 → help で一覧', 'color:#7abf75; font-size:12px;');
 }
