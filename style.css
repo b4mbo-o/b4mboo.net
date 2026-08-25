@@ -184,6 +184,12 @@ body {
 .service-name { font-size: 1.2rem; font-weight: 700; color: var(--text-main); }
 .status-dot { width: 6px; height: 6px; background: var(--bamboo-green); border-radius: 50%; box-shadow: 0 0 8px var(--bamboo-green); }
 .service-desc { font-size: 0.85rem; line-height: 1.65; color: var(--text-sub); margin-top: auto; margin-bottom: 15px; }
+.onion-address {
+    font-family: 'SFMono-Regular', Consolas, 'Liberation Mono', monospace;
+    font-size: 0.68rem;
+    line-height: 1.55;
+    overflow-wrap: anywhere;
+}
 .card-footer {
     font-size: 0.75rem; color: var(--text-sub); font-family: monospace;
     border-top: 1px solid var(--card-border); padding-top: 10px; width: 100%;
