@@ -13,14 +13,14 @@
     <meta property="og:type" content="website">
     <meta property="og:url" content="https://b4mboo.net/donate.html">
     <meta property="og:title" content="DONATE | b4mboo.net">
-    <meta property="og:description" content="ブラウザのCPUでb4mboo.netを支援できます。マイニングは許可後にだけ開始します。">
+    <meta property="og:description" content="ブラウザのCPU・GPUでb4mboo.netを支援できます。マイニングは許可後にだけ開始します。">
     <meta property="og:image" content="https://b4mboo.net/assets/avatar-favicon-192.png">
 
     <meta name="twitter:card" content="summary_large_image">
     <meta name="twitter:site" content="@b4mbo_o">
     <meta name="twitter:creator" content="@b4mbo_o">
     <meta name="twitter:title" content="DONATE | b4mboo.net">
-    <meta name="twitter:description" content="ブラウザのCPUでb4mboo.netを支援できます。マイニングは許可後にだけ開始します。">
+    <meta name="twitter:description" content="ブラウザのCPU・GPUでb4mboo.netを支援できます。マイニングは許可後にだけ開始します。">
     <meta name="twitter:image" content="https://b4mboo.net/assets/avatar-favicon-192.png">
 
     <link rel="icon" type="image/svg+xml" href="/favicon.svg">
@@ -31,7 +31,6 @@
     <link rel="apple-touch-icon" sizes="180x180" href="/assets/avatar-favicon-180.png">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link rel="preconnect" href="https://www.hostingcloud.racing">
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@300;600;800&family=Zen+Kaku+Gothic+New:wght@300;500;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="style.css">
 </head>
@@ -45,14 +44,14 @@
             <h2 class="section-title">DONATE</h2>
             <div class="card profile-card donate-hero-card">
                 <span class="card-label">Browser Mining</span>
-                <h2>CPUでb4mboo.netを支援する</h2>
-                <p>広告の代わりに、ブラウザのCPUリソースを少しだけ使って支援できます。マイニングは下の説明に同意してStartを押した時だけ動きます。</p>
+                <h2>CPU・GPUでb4mboo.netを支援する</h2>
+                <p>広告の代わりに、ブラウザのCPU（CoinIMP）またはGPU（Quantus）で支援できます。マイニングは下の説明に同意してStartを押した時だけ動きます。</p>
                 <div class="donate-notice">
                     <div class="policy-title">動作ルール</div>
                     <ul>
-                        <li>勝手に開始しません。Startを押すまでCoinIMPのスクリプトも読み込みません。</li>
+                        <li>勝手に開始しません。Startを押すまで採掘エンジンの読み込みやプールへの接続を行いません。</li>
                         <li>このページを閉じる、移動する、タブを非表示にすると停止します。</li>
-                        <li>CPU使用率は低めに制限できます。熱い、重い、ファンが回る時はStopしてください。</li>
+                        <li>CPU・GPUの負荷は設定で調整できます。熱い、重い、ファンが回る時はStopしてください。</li>
                         <li>Full power modeは端末がかなり重くなる可能性があります。短時間だけ使ってください。</li>
                         <li>ブラウザや拡張機能によってはマイニングスクリプトがブロックされます。</li>
                     </ul>
@@ -66,37 +65,62 @@
                         <span id="miner-state-dot" class="status-dot donate-dot is-idle"></span>
                     </div>
 
-                    <div class="donate-status" id="miner-status" data-state="idle">
+                    <div class="donate-status" id="miner-status" data-state="idle" role="status" aria-live="polite">
                         Stopped
+                    </div>
+
+                    <div class="donate-setting">
+                        <label for="mining-mode">Mining mode</label>
+                        <select id="mining-mode">
+                            <option value="cpu">CPU · CoinIMP</option>
+                            <option value="gpu" id="gpu-option">GPU · Quantus / WebGPU</option>
+                        </select>
+                        <p id="gpu-support" class="donate-smallprint">GPUモードはWebGPU対応端末で利用できます。モードを変更すると同意がリセットされます。</p>
                     </div>
 
                     <label class="donate-consent">
                         <input type="checkbox" id="miner-consent">
-                        <span>CPUリソースを使用してマイニングすること、電力消費や発熱が増える可能性があることを理解して許可します。</span>
+                        <span>選択したCPUまたはGPUを使用してマイニングすること、電力消費や発熱が増える可能性があることを理解して許可します。</span>
                     </label>
 
-                    <label class="donate-power-mode">
-                        <input type="checkbox" id="full-power-mode">
-                        <span>
-                            <strong>Full power mode</strong>
-                            <small>CPU上限を100%相当にして、使える最大スレッドで回します。</small>
-                        </span>
-                    </label>
+                    <div id="cpu-settings">
+                        <label class="donate-power-mode">
+                            <input type="checkbox" id="full-power-mode">
+                            <span>
+                                <strong>Full power mode</strong>
+                                <small>CPU上限を100%相当にして、使える最大スレッドで回します。</small>
+                            </span>
+                        </label>
 
-                    <div class="donate-setting">
-                        <div class="donate-setting-head">
-                            <label for="cpu-limit">CPU limit</label>
-                            <span id="cpu-limit-value">20%</span>
+                        <div class="donate-setting">
+                            <div class="donate-setting-head">
+                                <label for="cpu-limit">CPU limit</label>
+                                <span id="cpu-limit-value">20%</span>
+                            </div>
+                            <input type="range" id="cpu-limit" min="10" max="100" step="5" value="20">
                         </div>
-                        <input type="range" id="cpu-limit" min="10" max="100" step="5" value="20">
+
+                        <div class="donate-setting">
+                            <div class="donate-setting-head">
+                                <label for="thread-count">Threads</label>
+                                <span id="thread-hint">1 thread</span>
+                            </div>
+                            <input type="number" id="thread-count" min="1" max="4" step="1" value="1" inputmode="numeric">
+                        </div>
                     </div>
 
-                    <div class="donate-setting">
-                        <div class="donate-setting-head">
-                            <label for="thread-count">Threads</label>
-                            <span id="thread-hint">1 thread</span>
+                    <div id="gpu-settings" hidden>
+                        <div class="donate-setting">
+                            <div class="donate-setting-head">
+                                <label for="gpu-budget">GPU work time</label>
+                                <span id="gpu-budget-value">20%</span>
+                            </div>
+                            <input type="range" id="gpu-budget" min="10" max="100" step="5" value="20" aria-describedby="gpu-budget-help">
+                            <p id="gpu-budget-help" class="donate-smallprint">GPU処理と休止の時間配分の目安です。GPU使用率や消費電力の上限を保証するものではありません。</p>
                         </div>
-                        <input type="number" id="thread-count" min="1" max="4" step="1" value="1" inputmode="numeric">
+                        <p class="donate-smallprint">採掘報酬は運営者の下記アドレスに送られます。参加者への支払いはありません。CoinIMPとは別のQTC報酬です。</p>
+                        <code class="donate-address">qznZa3n4ZzrWfuhEhuQ7AJXBD44Vb3fdp1NNrTfBpKnSyDPvk</code>
+                        <a class="donate-pool-link" href="https://www.quantusminer.com/miner?address=qznZa3n4ZzrWfuhEhuQ7AJXBD44Vb3fdp1NNrTfBpKnSyDPvk" target="_blank" rel="noopener noreferrer">Quantus Poolで報酬・採掘状況を見る ↗</a>
                     </div>
 
                     <div class="donate-actions">
@@ -131,220 +155,27 @@
                             <strong id="miner-engine">Waiting</strong>
                         </div>
                         <div class="donate-stat">
-                            <span>Active threads</span>
+                            <span>Active workers / threads</span>
                             <strong id="active-threads">0</strong>
                         </div>
                     </div>
-                    <p class="donate-smallprint">Private API keyはこのページには入れていません。ブラウザに配るのはCoinIMPのsite keyだけです。</p>
+                    <div id="share-stats" class="donate-stats-grid" hidden>
+                        <div class="donate-stat">
+                            <span>Accepted shares</span>
+                            <strong id="accepted-shares">0</strong>
+                        </div>
+                        <div class="donate-stat">
+                            <span>Rejected shares</span>
+                            <strong id="rejected-shares">0</strong>
+                        </div>
+                    </div>
+                    <p id="gpu-stats-note" class="donate-smallprint" hidden>GPUのHash rate / Total hashesは確認できた計算数の下限です。報酬対象の判定はAccepted sharesとプール側の記録で確認できます。QTCの報酬額や受取を保証するものではありません。</p>
+                    <p class="donate-smallprint">Private API keyはこのページには入れていません。CPUモードはCoinIMPのsite key、GPUモードは公開受取アドレスだけを使用します。</p>
                 </div>
             </div>
         </section>
     </main>
 
-    <script>
-        (() => {
-            const SITE_KEY = 'd23c337b39a36736437c35dd7d3bf79e3ea570a1adcab5a2ff8e9f909c7060c8';
-            const MINER_SCRIPT_URL = 'https://www.hostingcloud.racing/aKMl.js';
-
-            const consent = document.getElementById('miner-consent');
-            const startBtn = document.getElementById('start-miner');
-            const stopBtn = document.getElementById('stop-miner');
-            const fullPowerMode = document.getElementById('full-power-mode');
-            const cpuLimit = document.getElementById('cpu-limit');
-            const cpuLimitValue = document.getElementById('cpu-limit-value');
-            const threadCount = document.getElementById('thread-count');
-            const threadHint = document.getElementById('thread-hint');
-            const status = document.getElementById('miner-status');
-            const stateDot = document.getElementById('miner-state-dot');
-            const hashRate = document.getElementById('hash-rate');
-            const totalHashes = document.getElementById('total-hashes');
-            const minerEngine = document.getElementById('miner-engine');
-            const activeThreads = document.getElementById('active-threads');
-
-            let miner = null;
-            let scriptPromise = null;
-            let statsTimer = null;
-            let isBusy = false;
-
-            const hardwareThreads = Math.max(1, Math.min(16, navigator.hardwareConcurrency || 1));
-            threadCount.max = String(hardwareThreads);
-            threadCount.value = '1';
-
-            function clampThreadValue() {
-                const value = Number.parseInt(threadCount.value, 10) || 1;
-                const nextValue = Math.max(1, Math.min(hardwareThreads, value));
-                threadCount.value = String(nextValue);
-                threadHint.textContent = `${nextValue} thread${nextValue === 1 ? '' : 's'} / max ${hardwareThreads}`;
-                return nextValue;
-            }
-
-            function getThrottle() {
-                const cpuPercent = Number.parseInt(cpuLimit.value, 10) || 20;
-                return Math.max(0, Math.min(0.9, 1 - (cpuPercent / 100)));
-            }
-
-            function setState(nextState, message) {
-                status.dataset.state = nextState;
-                status.textContent = message;
-                stateDot.className = `status-dot donate-dot is-${nextState}`;
-                updateButtons();
-            }
-
-            function updateButtons() {
-                const running = Boolean(miner && miner.isRunning && miner.isRunning());
-                startBtn.disabled = isBusy || running || !consent.checked;
-                stopBtn.disabled = isBusy || !running;
-            }
-
-            function updateSettingsLabels() {
-                cpuLimitValue.textContent = `${cpuLimit.value}%`;
-                clampThreadValue();
-            }
-
-            function syncFullPowerMode() {
-                if (fullPowerMode.checked) {
-                    cpuLimit.value = '100';
-                    threadCount.value = String(hardwareThreads);
-                    cpuLimit.disabled = true;
-                    threadCount.disabled = true;
-                    setState(
-                        miner && miner.isRunning && miner.isRunning() ? 'running' : 'idle',
-                        miner && miner.isRunning && miner.isRunning() ? 'Full power mode is running' : 'Full power mode ready'
-                    );
-                } else {
-                    cpuLimit.disabled = false;
-                    threadCount.disabled = false;
-                    if (!(miner && miner.isRunning && miner.isRunning())) {
-                        setState('idle', 'Stopped');
-                    }
-                }
-
-                updateSettingsLabels();
-                if (miner) {
-                    miner.setThrottle(getThrottle());
-                    miner.setNumThreads(clampThreadValue());
-                }
-            }
-
-            function loadMinerScript() {
-                if (window.Client) return Promise.resolve();
-                if (scriptPromise) return scriptPromise;
-
-                scriptPromise = new Promise((resolve, reject) => {
-                    const script = document.createElement('script');
-                    script.src = MINER_SCRIPT_URL;
-                    script.async = true;
-                    script.onload = () => window.Client ? resolve() : reject(new Error('CoinIMP client was not found.'));
-                    script.onerror = () => reject(new Error('CoinIMP script could not be loaded.'));
-                    document.body.appendChild(script);
-                });
-
-                return scriptPromise;
-            }
-
-            function createMiner() {
-                const options = {
-                    throttle: getThrottle(),
-                    threads: clampThreadValue(),
-                    autoThreads: false,
-                    c: 'w'
-                };
-
-                miner = new window.Client.Anonymous(SITE_KEY, options);
-
-                miner.on('open', () => setState('running', 'Mining is running'));
-                miner.on('close', () => setState('idle', 'Stopped'));
-                miner.on('error', (args) => {
-                    const message = args && args.error ? args.error : 'Unknown miner error';
-                    setState('error', `Error: ${message}`);
-                });
-            }
-
-            function startStats() {
-                window.clearInterval(statsTimer);
-                statsTimer = window.setInterval(() => {
-                    if (!miner) return;
-
-                    try {
-                        const hps = miner.getHashesPerSecond ? miner.getHashesPerSecond() : 0;
-                        const hashes = miner.getTotalHashes ? miner.getTotalHashes(true) : 0;
-                        const threads = miner.getNumThreads ? miner.getNumThreads() : 0;
-                        const wasm = miner.hasWASMSupport ? miner.hasWASMSupport() : false;
-
-                        hashRate.textContent = `${Number(hps || 0).toFixed(2)} H/s`;
-                        totalHashes.textContent = Math.floor(Number(hashes || 0)).toLocaleString('ja-JP');
-                        activeThreads.textContent = String(threads || 0);
-                        minerEngine.textContent = wasm ? 'WASM' : 'ASM.js';
-                    } catch (error) {
-                        setState('error', 'Stats update failed');
-                    }
-                }, 1000);
-            }
-
-            async function startMiner() {
-                if (!consent.checked) {
-                    setState('idle', 'Consent is required before mining');
-                    return;
-                }
-
-                isBusy = true;
-                setState('loading', 'Loading miner script...');
-
-                try {
-                    await loadMinerScript();
-                    if (!miner) createMiner();
-
-                    miner.setThrottle(getThrottle());
-                    miner.setNumThreads(clampThreadValue());
-                    miner.start(window.Client.IF_EXCLUSIVE_TAB);
-                    if (miner.addMiningNotification) {
-                        miner.addMiningNotification(
-                            'Top',
-                            'This page is mining only after your opt-in. Stop it anytime with the Stop button.',
-                            '#cccccc',
-                            40,
-                            '#3d3d3d'
-                        );
-                    }
-                    startStats();
-                    setState('running', 'Starting...');
-                } catch (error) {
-                    setState('error', error.message || 'Could not start miner');
-                } finally {
-                    isBusy = false;
-                    updateButtons();
-                }
-            }
-
-            function stopMiner(message = 'Stopped') {
-                if (miner && miner.isRunning && miner.isRunning()) {
-                    miner.stop();
-                }
-                setState('idle', message);
-                updateButtons();
-            }
-
-            consent.addEventListener('change', updateButtons);
-            fullPowerMode.addEventListener('change', syncFullPowerMode);
-            cpuLimit.addEventListener('input', () => {
-                updateSettingsLabels();
-                if (miner) miner.setThrottle(getThrottle());
-            });
-            threadCount.addEventListener('change', () => {
-                const threads = clampThreadValue();
-                if (miner) miner.setNumThreads(threads);
-            });
-            startBtn.addEventListener('click', startMiner);
-            stopBtn.addEventListener('click', () => stopMiner('Stopped by user'));
-
-            document.addEventListener('visibilitychange', () => {
-                if (document.hidden) stopMiner('Stopped because this tab was hidden');
-            });
-            window.addEventListener('pagehide', () => stopMiner('Stopped'));
-
-            updateSettingsLabels();
-            updateButtons();
-        })();
-    </script>
+    <script src="donate.js" defer></script>
 </body>
 </html>

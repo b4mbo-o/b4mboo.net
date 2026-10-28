@@ -41,6 +41,37 @@ b4mboo.net/
 
 ## 🚀 Deployment
 
+### Donate mining
+
+`donate.html` supports opt-in CPU mining via CoinIMP and GPU mining of Quantus
+(QTC) via WebGPU. `donate.js` contains the public payout address and pool URL.
+No wallet secret or private API key is used. Changing modes requires fresh
+consent. Stop, revoking consent, hiding the tab and leaving the page terminate
+mining, including during initialization. GPU errors stop mining without
+automatically starting the CPU engine.
+
+GPU mode needs HTTPS (localhost also works) and a working WebGPU adapter.
+The work-time slider inserts pauses between dispatches; it is not a hardware
+utilization or power limit. GPU initialization checks a known-answer vector and
+each found share is independently verified before submission. Displayed GPU
+hash counts are lower bounds because an early-exit dispatch does not expose
+its exact hash count. Accepted shares are reported only after pool confirmation.
+Pool availability, accepted shares, payout and earnings depend on the third-party
+pool and have not been verified by a live mining run. An upgrade-only WebSocket
+check accepted `Origin: https://b4mboo.net` (HTTP 101); no mining handshake or
+payout address was sent. Local browser checks cover desktop/mobile layouts and
+the real WebGPU worker with a software adapter against a mocked pool.
+
+The unmodified shader in `assets/quantus/mining.wgsl` and the constants/reference
+algorithm in `quantus-pow.js` come from
+[Quantus-Network/quantus-miner](https://github.com/Quantus-Network/quantus-miner/tree/8e2d27219c93567fca67bf049f52882f6c87df35)
+(Apache-2.0, license in `assets/quantus/LICENSE`). The browser worker and pool
+controller are implemented locally; the pool website's scripts are not copied.
+
+Offline validation: `node --test tests/*.test.mjs` and
+`node --check donate.js`, `node --check quantus-gpu-worker.js`,
+`node --check quantus-pow.js`, `node --check main.js`.
+
 このプロジェクトは静的なWebサイトです。
 NginxやApacheなどのWebサーバーのドキュメントルート（例: `/var/www/html/`）にファイルを配置するだけで動作します。
 

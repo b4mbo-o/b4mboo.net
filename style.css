@@ -401,6 +401,34 @@ button { padding: 8px 24px; border-radius: 4px; font-size: 0.8rem; font-weight: 
     line-height: 1.5;
 }
 .donate-setting { margin-top: 18px; }
+.donate-page [hidden] { display: none !important; }
+.donate-setting > label { color: var(--text-sub); font-size: 0.8rem; }
+.donate-setting select {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin-top: 8px;
+    padding: 12px;
+    border: 1px solid var(--card-border);
+    border-radius: 8px;
+    background: var(--input-bg);
+    color: var(--text-main);
+    font: inherit;
+}
+.donate-setting select:disabled { opacity: 0.55; }
+.donate-address {
+    display: block;
+    margin-top: 10px;
+    overflow-wrap: anywhere;
+    color: var(--text-main);
+    font-size: 0.8rem;
+}
+.donate-pool-link {
+    display: inline-block;
+    margin-top: 10px;
+    color: var(--bamboo-green);
+    font-size: 0.82rem;
+}
 .donate-setting-head {
     display: flex;
     align-items: center;
