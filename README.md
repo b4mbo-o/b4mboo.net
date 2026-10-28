@@ -51,8 +51,12 @@ mining, including during initialization. GPU errors stop mining without
 automatically starting the CPU engine.
 
 GPU mode needs HTTPS (localhost also works) and a working WebGPU adapter.
-The work-time slider inserts pauses between dispatches; it is not a hardware
-utilization or power limit. GPU initialization checks a known-answer vector and
+The work-time slider inserts pauses below 100%; at 100% there is no intentional
+pause. It is not a hardware utilization or power limit. Dispatches adapt toward
+30ms up to 1,048,576 nonces (also bounded by device limits); buffers and the
+header/high-nonce midstate are reused. Early-exit batches do not drive the size
+estimate. The selected GPU is displayed after initialization.
+GPU initialization checks a known-answer vector and
 each found share is independently verified before submission. Displayed GPU
 hash counts are lower bounds because an early-exit dispatch does not expose
 its exact hash count. Accepted shares are reported only after pool confirmation.

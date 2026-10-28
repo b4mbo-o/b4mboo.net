@@ -226,6 +226,7 @@
                 if (message.kind === 'error') return fail(message.message);
                 if (message.kind === 'ready') {
                     $('active-threads').textContent = '1 GPU worker';
+                    $('gpu-adapter').textContent = `使用GPU: ${message.adapter || 'WebGPU adapter'}`;
                     connectPool(id);
                 }
                 if (message.jobId !== workId || !job) return;

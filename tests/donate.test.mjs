@@ -114,7 +114,8 @@ test('pool uses the configured payout, ignores stale work and counts only confir
     const f = fixture();
     await f.gpuStart();
     const worker = f.workers[0];
-    worker.emit({ kind: 'ready' });
+    worker.emit({ kind: 'ready', adapter: 'NVIDIA GeForce RTX 4070' });
+    assert.equal(f.elements['gpu-adapter'].textContent, '使用GPU: NVIDIA GeForce RTX 4070');
     const socket = f.sockets[0];
     socket.open();
     assert.equal(JSON.parse(socket.sent[0]).Hello.payout_address, payout);
